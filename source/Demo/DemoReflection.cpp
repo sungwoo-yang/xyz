@@ -61,12 +61,12 @@ void DemoLaserReflection::Update()
 
     if (input.KeyDown(CS230::Input::Keys::Left))
     {
-        shieldAngle += rotateSpeed * dt;
+        shieldAngle -= rotateSpeed * dt;
     }
 
     if (input.KeyDown(CS230::Input::Keys::Right))
     {
-        shieldAngle -= rotateSpeed * dt;
+        shieldAngle += rotateSpeed * dt;
     }
 
     shieldAngle = std::clamp(shieldAngle, 0.0, PI);

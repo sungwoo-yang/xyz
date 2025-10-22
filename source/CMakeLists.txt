@@ -23,6 +23,7 @@ set(SOURCE_CODE
 
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp
+    Engine/Font.hpp Engine/Font.cpp
     Engine/FPS.hpp
     Engine/GameState.hpp
     Engine/GameStateManager.hpp Engine/GameStateManager.cpp
