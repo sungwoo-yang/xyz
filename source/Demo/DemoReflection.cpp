@@ -6,32 +6,29 @@
 #include "Engine/Input.hpp"
 #include "Engine/Logger.hpp"
 #include "Engine/Matrix.hpp"
-#include "Engine/Physics/Reflection.hpp" // Physics 네임스페이스 함수 선언 포함
+#include "Engine/Physics/Reflection.hpp"
 #include "Engine/Window.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <imgui.h>
 #include <limits>
-#include <numbers> // std::numbers 사용 가능 시 (C++20)
-#include <string>  // std::to_string 사용 위해 추가
+#include <numbers>
+#include <string>
 
-// --- 보조 함수 정의 ---
-namespace // Anonymous namespace for helper functions
+namespace
 {
-    // 내적 계산
+
     inline double dot(const Math::vec2& a, const Math::vec2& b)
     {
         return a.x * b.x + a.y * b.y;
     }
 
-    // 벡터에 수직인 벡터 계산 (시계 반대 방향 90도 회전)
     inline Math::vec2 perpendicular(const Math::vec2& v)
     {
         return Math::vec2{ -v.y, v.x };
     }
 
-    // Helper function: Line segment-circle intersection
     bool LineCircleIntersection(Math::vec2 p1, Math::vec2 p2, Math::vec2 center, double radius, Math::vec2& intersection)
     {
         Math::vec2 d = p2 - p1;
@@ -51,7 +48,7 @@ namespace // Anonymous namespace for helper functions
             double t1          = (-b - discriminant) / (2.0 * a);
             double t2          = (-b + discriminant) / (2.0 * a);
             bool   intersected = false;
-            // Intersection point calculation adjusted slightly for clarity
+
             if (t1 >= -std::numeric_limits<double>::epsilon() && t1 <= 1.0 + std::numeric_limits<double>::epsilon())
             {
                 intersection = p1 + d * t1;
@@ -59,7 +56,6 @@ namespace // Anonymous namespace for helper functions
             }
             if (t2 >= -std::numeric_limits<double>::epsilon() && t2 <= 1.0 + std::numeric_limits<double>::epsilon())
             {
-                // If t1 wasn't valid or t2 is also valid (we just need one valid point on the segment)
                 if (!intersected)
                 {
                     intersection = p1 + d * t2;
@@ -70,7 +66,6 @@ namespace // Anonymous namespace for helper functions
         }
     }
 
-    // --- 색상 보간 관련 함수들 ---
     CS200::RGBA LerpColor(CS200::RGBA start, CS200::RGBA end, double t)
     {
         t                      = std::clamp(t, 0.0, 1.0);
@@ -111,10 +106,7 @@ namespace // Anonymous namespace for helper functions
         current += easing * (target - current);
     }
 
-} // end anonymous namespace
-
-// --- 보조 함수 정의 끝 ---
-
+}
 
 void DemoLaserReflection::Load()
 {
@@ -127,21 +119,23 @@ void DemoLaserReflection::Load()
     laserTimer            = 0.0;
     laserColor            = COLOR_RED;
     showingWarningLaser   = false;
-    warningLaserColor     = COLOR_WARNING; // 초기 예고선 색상 설정
+    warningLaserColor     = COLOR_WARNING;
     isParrying            = false;
     parryWindowActive     = false;
     parryTimer            = 0.0;
     shieldColor           = COLOR_CYAN;
-    currentShieldColor    = CS200::unpack_color(COLOR_CYAN); // float 배열 초기화
-    targetShieldColor     = CS200::unpack_color(COLOR_CYAN); // float 배열 초기화
-    shieldHitTimer        = shieldColorRecoveryTime;         // 바로 복구 가능하도록 초기화
+    currentShieldColor    = CS200::unpack_color(COLOR_CYAN);
+    targetShieldColor     = CS200::unpack_color(COLOR_CYAN);
+    shieldHitTimer        = shieldColorRecoveryTime;
     isShieldFrozen        = false;
     shieldFrozenTimer     = 0.0;
 
     targets.clear();
-    targets.push_back({}); // 오른쪽 위
+
+    targets.push_back({});
     targets.back().position = { windowSize.x - 50.0, windowSize.y - 50.0 };
-    targets.push_back({}); // 왼쪽 아래
+
+    targets.push_back({});
     targets.back().position = { 50.0, 50.0 };
 
     UpdateShield();
@@ -149,7 +143,6 @@ void DemoLaserReflection::Load()
 
 void DemoLaserReflection::Unload()
 {
-    // 리소스 해제 코드
 }
 
 gsl::czstring DemoLaserReflection::GetName() const
@@ -162,64 +155,56 @@ void DemoLaserReflection::Update()
     const auto&  input = Engine::GetInput();
     const double dt    = Engine::GetWindowEnvironment().DeltaTime;
 
-    // --- 레이저 타이머 및 상태 업데이트 ---
     laserTimer += dt;
     double cycleTime = fmod(laserTimer, laserCycleTime);
 
     bool prevLaserState = isLaserOn;
-    // bool prevWarningState = showingWarningLaser;
 
     showingWarningLaser = !isLaserOn && (cycleTime >= laserCycleTime - warningLaserLeadTime);
     isLaserOn           = (cycleTime < laserOnDuration);
 
-    // --- 패링 윈도우 관리 및 예고선 색상 결정 ---
-    parryWindowActive = false; // 기본값은 비활성
+    parryWindowActive = false;
     if (showingWarningLaser)
     {
-        // 예고 시간이 시작된 후 얼마나 지났는지 계산
         double timeIntoWarning = cycleTime - (laserCycleTime - warningLaserLeadTime);
 
-        // 예고 시간의 후반부 0.5초가 패리 윈도우
         if (timeIntoWarning >= parryWindowStartTimeOffset)
         {
             parryWindowActive = true;
-            warningLaserColor = COLOR_PARRY_WARNING; // 하늘색 예고선
+            warningLaserColor = COLOR_PARRY_WARNING;
             parryTimer += dt;
             if (input.KeyJustPressed(CS230::Input::Keys::Space))
             {
-                isParrying = true; // 패링 성공 플래그 설정
+                isParrying = true;
                 Engine::GetLogger().LogEvent("Parry Input Success!");
             }
         }
-        else // 예고 시간의 전반부
+        else
         {
-            warningLaserColor = COLOR_WARNING; // 빨간색 예고선
-            parryTimer        = 0.0;           // 패리 윈도우 시작 전이므로 타이머 리셋
+            warningLaserColor = COLOR_WARNING;
+            parryTimer        = 0.0;
         }
     }
-    else // 예고 시간이 아닐 때
+    else
     {
         parryTimer        = 0.0;
-        warningLaserColor = COLOR_WARNING; // 기본값으로 리셋
+        warningLaserColor = COLOR_WARNING;
     }
 
-
-    // --- 쉴드 고정 타이머 업데이트 ---
     if (isShieldFrozen)
     {
         shieldFrozenTimer += dt;
         if (shieldFrozenTimer >= shieldFreezeDuration)
         {
-            isShieldFrozen    = false; // 고정 해제
+            isShieldFrozen    = false;
             shieldFrozenTimer = 0.0;
             Engine::GetLogger().LogEvent("Shield Unfrozen.");
         }
     }
 
-    // --- 레이저 색상 및 상태 업데이트 ---
     if (isLaserOn)
     {
-        if (prevLaserState == false) // 레이저가 방금 켜졌을 때
+        if (prevLaserState == false)
         {
             if (isParrying)
             {
@@ -240,13 +225,12 @@ void DemoLaserReflection::Update()
                     Engine::GetLogger().LogEvent("Shield hit by RED laser (Initial)!");
                 }
             }
-            isParrying = false; // 패링 상태는 레이저 켜지면 리셋
+            isParrying = false;
         }
-        else if (laserColor == COLOR_RED) // 레이저가 이미 켜져 있고 빨간색일 때
+        else if (laserColor == COLOR_RED)
         {
-            if (CheckShieldCollision()) // 매 프레임 충돌 검사
+            if (CheckShieldCollision())
             {
-                // 아직 빨간색으로 변하는 중이 아니거나 이미 복구 중이었다면 다시 타이머 리셋
                 if (shieldHitTimer >= shieldColorRecoveryTime || !(targetShieldColor[0] > 0.9f && targetShieldColor[1] < 0.1f && targetShieldColor[2] < 0.1f))
                 {
                     targetShieldColor = CS200::unpack_color(COLOR_RED);
@@ -255,19 +239,18 @@ void DemoLaserReflection::Update()
             }
         }
     }
-    else // 레이저가 꺼져 있을 때
+    else
     {
-        if (prevLaserState == true) // 레이저가 방금 꺼졌을 때
+        if (prevLaserState == true)
         {
-            laserColor = COLOR_RED; // 색상 리셋
+            laserColor = COLOR_RED;
             Engine::GetLogger().LogEvent("Laser turned OFF");
         }
-        // --- 예고선 경로 계산 로직 (매 프레임) ---
+
         if (showingWarningLaser)
         {
-            // 예고선은 항상 반사되어야 하므로, 쉴드를 포함하여 경로 계산
             std::vector<std::pair<Math::vec2, Math::vec2>> reflectionSegments;
-            reflectionSegments.push_back({ shieldStart, shieldEnd }); // 현재 쉴드 위치 사용
+            reflectionSegments.push_back({ shieldStart, shieldEnd });
 
             const auto windowSize = Engine::GetWindow().GetSize();
             Math::vec2 center     = { windowSize.x / 2.0, windowSize.y / 2.0 };
@@ -277,21 +260,18 @@ void DemoLaserReflection::Update()
                 initialDir = { 1.0, -1.0 };
                 initialDir = initialDir.Normalize();
             }
-            // Physics::CalculateLaserPath 직접 호출 (쉴드 포함)
+
             warningLaserPath = Physics::CalculateLaserPath(laserOrigin, initialDir, reflectionSegments);
-            laserPath.clear(); // 주 레이저 경로는 비움 (레이저 꺼진 상태이므로)
+            laserPath.clear();
         }
         else
         {
             warningLaserPath.clear();
-        } // 예고 시간 아니면 경로 비움
+        }
     }
 
-    // --- 쉴드 색상 복구 로직 ---
     UpdateShieldColor(dt);
 
-
-    // --- 캐릭터 이동 및 실드 회전 (고정 상태 아닐 때만) ---
     if (!isShieldFrozen)
     {
         const double moveSpeed = 200.0;
@@ -314,7 +294,7 @@ void DemoLaserReflection::Update()
             characterPos          = nextPos;
         }
 
-        const double rotateSpeed = PI;
+        const double rotateSpeed = PI / 2.0;
         if (input.KeyDown(CS230::Input::Keys::Left))
             shieldAngle += rotateSpeed * dt;
         if (input.KeyDown(CS230::Input::Keys::Right))
@@ -324,12 +304,10 @@ void DemoLaserReflection::Update()
             shieldAngle += 2.0 * PI;
     }
 
-
-    // --- 상태 업데이트 및 계산 ---
-    UpdateShield(); // 쉴드 위치는 매 프레임 업데이트
+    UpdateShield();
     if (isLaserOn)
     {
-        CalculateLaser(laserColor == COLOR_YELLOW); // 주 레이저 경로 계산
+        CalculateLaser(laserColor == COLOR_YELLOW);
         if (laserColor == COLOR_YELLOW)
         {
             for (TargetState& target : targets)
@@ -343,13 +321,12 @@ void DemoLaserReflection::Update()
             }
         }
     }
-    else if (!showingWarningLaser) // 레이저 꺼져있고 예고선도 없으면 주 레이저 경로 비움
+    else if (!showingWarningLaser)
     {
         laserPath.clear();
     }
 }
 
-// --- 쉴드 색상 업데이트 함수 ---
 void DemoLaserReflection::UpdateShieldColor(double dt)
 {
     bool isTargetRed = (targetShieldColor[0] > 0.9f && targetShieldColor[1] < 0.1f && targetShieldColor[2] < 0.1f);
@@ -373,7 +350,6 @@ void DemoLaserReflection::UpdateShieldColor(double dt)
     shieldColor = CS200::pack_color(currentShieldColor);
 }
 
-// --- 쉴드 위치 업데이트 함수 ---
 void DemoLaserReflection::UpdateShield()
 {
     double dx   = (shieldLength / 2.0) * std::cos(shieldAngle);
@@ -382,11 +358,10 @@ void DemoLaserReflection::UpdateShield()
     shieldEnd   = characterPos - Math::vec2{ dx, dy };
 }
 
-// --- 레이저 경로 계산 함수 ---
 void DemoLaserReflection::CalculateLaser(bool parrySuccess)
 {
     std::vector<std::pair<Math::vec2, Math::vec2>> reflectionSegments;
-    // 패링 성공 시(또는 예고선 계산 시)에만 쉴드 세그먼트를 반사 세그먼트 목록에 추가
+
     if (parrySuccess)
     {
         reflectionSegments.push_back({ shieldStart, shieldEnd });
@@ -401,11 +376,10 @@ void DemoLaserReflection::CalculateLaser(bool parrySuccess)
         initialDir = { 1.0, -1.0 };
         initialDir = initialDir.Normalize();
     }
-    // Physics::CalculateLaserPath 호출
+
     laserPath = Physics::CalculateLaserPath(laserOrigin, initialDir, reflectionSegments);
 }
 
-// --- 쉴드 충돌 검사 함수 ---
 bool DemoLaserReflection::CheckShieldCollision() const
 {
     const auto windowSize = Engine::GetWindow().GetSize();
@@ -419,11 +393,10 @@ bool DemoLaserReflection::CheckShieldCollision() const
 
     Math::vec2 intersectionPoint;
     double     t;
-    // 쉴드 세그먼트와 레이저의 첫 번째 충돌만 검사 (관통하기 전 경로 기준)
+
     return Physics::RaySegmentIntersection(laserOrigin, initialDir, shieldStart, shieldEnd, intersectionPoint, t);
 }
 
-// --- 타겟 충돌 검사 함수 ---
 bool DemoLaserReflection::CheckCollision(const TargetState& target) const
 {
     Math::vec2 intersectionPoint;
@@ -437,7 +410,6 @@ bool DemoLaserReflection::CheckCollision(const TargetState& target) const
     return false;
 }
 
-// --- 그리기 함수 ---
 void DemoLaserReflection::Draw() const
 {
     CS200::RenderingAPI::Clear();
@@ -447,24 +419,22 @@ void DemoLaserReflection::Draw() const
     renderer.BeginScene(CS200::build_ndc_matrix(windowSize));
 
     renderer.DrawCircle(Math::TranslationMatrix(characterPos) * Math::ScaleMatrix(10.0), COLOR_WHITE);
-    renderer.DrawLine(shieldStart, shieldEnd, shieldColor, 3.0); // shieldColor 사용
+    renderer.DrawLine(shieldStart, shieldEnd, shieldColor, 3.0);
     for (const auto& target : targets)
     {
         renderer.DrawCircle(Math::TranslationMatrix(target.position) * Math::ScaleMatrix(target.radius), target.color);
     }
 
-    // --- 예고선 그릴 때 warningLaserColor 사용 ---
     if (showingWarningLaser)
     {
         for (const auto& segment : warningLaserPath)
         {
             if (std::isfinite(segment.first.x) && std::isfinite(segment.first.y) && std::isfinite(segment.second.x) && std::isfinite(segment.second.y))
             {
-                renderer.DrawLine(segment.first, segment.second, warningLaserColor, warningLaserWidth); // 수정됨
+                renderer.DrawLine(segment.first, segment.second, warningLaserColor, warningLaserWidth);
             }
         }
     }
-    // --- 수정 끝 ---
 
     if (isLaserOn)
     {
@@ -480,11 +450,10 @@ void DemoLaserReflection::Draw() const
     renderer.EndScene();
 }
 
-// --- ImGui 그리기 함수 ---
 void DemoLaserReflection::DrawImGui()
 {
     ImGui::Begin("Laser Reflection Info");
-    // ... 캐릭터, 쉴드 정보 ...
+
     ImGui::Text("Character Position: (%.1f, %.1f)", characterPos.x, characterPos.y);
     ImGui::Text("Shield Angle (Degrees): %.1f", shieldAngle * 180.0 / PI);
     ImGui::Text("Shield Start: (%.1f, %.1f)", shieldStart.x, shieldStart.y);
@@ -494,35 +463,34 @@ void DemoLaserReflection::DrawImGui()
     ImGui::Text("Shield Frozen: %s (%.1f / %.1f s)", isShieldFrozen ? "YES" : "NO", isShieldFrozen ? shieldFrozenTimer : 0.0f, shieldFreezeDuration);
 
     ImGui::Separator();
-    // ... 레이저 정보 ...
+
     ImGui::Text("Laser State: %s", isLaserOn ? "ON" : (showingWarningLaser ? "WARNING" : "OFF"));
     ImGui::Text("Laser Origin: (%.1f, %.1f)", laserOrigin.x, laserOrigin.y);
     ImGui::Text("Laser Timer: %.2f / %.2f", fmod(laserTimer, laserCycleTime), laserCycleTime);
     const char* colorName = (laserColor == COLOR_RED) ? "RED" : (laserColor == COLOR_YELLOW ? "YELLOW" : "UNKNOWN");
     ImGui::Text("Laser Color: %s", colorName);
-    // --- 예고선 색상 정보 추가 ---
+
     const char* warnColorName = (warningLaserColor == COLOR_WARNING) ? "RED" : ((warningLaserColor == COLOR_PARRY_WARNING) ? "CYAN" : "UNKNOWN");
     ImGui::Text("Warning Laser Color: %s", showingWarningLaser ? warnColorName : "N/A");
     ImGui::Text("Parry Window: %s", parryWindowActive ? "ACTIVE" : "INACTIVE");
     ImGui::Text("Parrying: %s", isParrying ? "YES (Input success)" : "NO");
 
-    // ... 타겟 정보 및 리셋 버튼 ...
     ImGui::SeparatorText("Targets Info");
     for (size_t i = 0; i < targets.size(); ++i)
     {
         const auto& target = targets[i];
-        ImGui::PushID(static_cast<int>(i)); // 각 타겟 구분을 위한 ID 푸시
+        ImGui::PushID(static_cast<int>(i));
         const char* targetColorName = (target.color == COLOR_RED) ? "RED" : (target.color == COLOR_GREEN ? "GREEN" : "UNKNOWN");
         ImGui::Text("Target %zu Position: (%.1f, %.1f)", i + 1, target.position.x, target.position.y);
         ImGui::Text("Target %zu Color: %s", i + 1, targetColorName);
         ImGui::Text("Target %zu Hit: %s", i + 1, target.hitByParriedLaser ? "YES" : "NO");
-        ImGui::PopID(); // ID 팝
+        ImGui::PopID();
         if (i < targets.size() - 1)
-            ImGui::Separator(); // 타겟 사이에 구분선
+            ImGui::Separator();
     }
-    if (ImGui::Button("Reset Targets")) // 버튼 이름 변경
+    if (ImGui::Button("Reset Targets"))
     {
-        for (TargetState& target : targets) // 모든 타겟 리셋
+        for (TargetState& target : targets)
         {
             target.color             = COLOR_RED;
             target.hitByParriedLaser = false;
@@ -530,7 +498,6 @@ void DemoLaserReflection::DrawImGui()
         Engine::GetLogger().LogEvent("All Targets Reset!");
     }
 
-    // ... 레이저 경로 정보 ...
     ImGui::Separator();
     ImGui::Text("Laser Path Segments: %zu", laserPath.size());
     if (ImGui::TreeNode("Path Details"))

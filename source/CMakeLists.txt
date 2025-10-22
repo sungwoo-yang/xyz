@@ -16,6 +16,7 @@ set(SOURCE_CODE
     CS200/RenderingAPI.hpp CS200/RenderingAPI.cpp
     CS200/RGBA.hpp
 
+    Demo/DemoAstar.hpp Demo/DemoAstar.cpp
     Demo/DemoShapes.hpp Demo/DemoShapes.cpp
     Demo/DemoFramebuffer.hpp Demo/DemoFramebuffer.cpp
     Demo/DemoReflection.hpp Demo/DemoReflection.cpp
