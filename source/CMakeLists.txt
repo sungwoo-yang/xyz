@@ -22,6 +22,7 @@ set(SOURCE_CODE
     Demo/DemoReflection.hpp Demo/DemoReflection.cpp
     Demo/DemoText.hpp Demo/DemoText.cpp
 
+    Engine/Dash.hpp Engine/Dash.cpp
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp
     Engine/Font.hpp Engine/Font.cpp

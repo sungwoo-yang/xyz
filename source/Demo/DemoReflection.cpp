@@ -2,7 +2,9 @@
 #include "CS200/IRenderer2D.hpp"
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
+#include "DemoAstar.hpp"
 #include "Engine/Engine.hpp"
+#include "Engine/GameStateManager.hpp"
 #include "Engine/Input.hpp"
 #include "Engine/Logger.hpp"
 #include "Engine/Matrix.hpp"
@@ -516,6 +518,12 @@ void DemoLaserReflection::DrawImGui()
             ImGui::Text("Seg %zu: (%.1f, %.1f) -> (%.1f, %.1f)", i, warningLaserPath[i].first.x, warningLaserPath[i].first.y, warningLaserPath[i].second.x, warningLaserPath[i].second.y);
         }
         ImGui::TreePop();
+    }
+
+    if (ImGui::Button("Switch to Demo Astar"))
+    {
+        Engine::GetGameStateManager().PopState();
+        Engine::GetGameStateManager().PushState<DemoAstar>();
     }
 
     ImGui::End();
