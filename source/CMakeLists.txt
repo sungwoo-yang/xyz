@@ -18,11 +18,10 @@ set(SOURCE_CODE
 
     Demo/DemoShapes.hpp Demo/DemoShapes.cpp
     Demo/DemoFramebuffer.hpp Demo/DemoFramebuffer.cpp
-    Demo/DemoText.hpp Demo/DemoText.cpp
+    Demo/DemoReflection.hpp Demo/DemoReflection.cpp
 
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp
-    Engine/Font.hpp Engine/Font.cpp
     Engine/FPS.hpp
     Engine/GameState.hpp
     Engine/GameStateManager.hpp Engine/GameStateManager.cpp
@@ -37,6 +36,7 @@ set(SOURCE_CODE
     Engine/Timer.hpp
     Engine/Vec2.hpp Engine/Vec2.cpp
     Engine/Window.hpp Engine/Window.cpp
+    Engine/Physics/Reflection.hpp Engine/Physics/Reflection.cpp
 
     OpenGL/Buffer.hpp OpenGL/Buffer.cpp
     OpenGL/Environment.hpp

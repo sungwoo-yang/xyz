@@ -1,7 +1,7 @@
 ﻿/**
  * \file
  * \author Rudy Castan
- * \author TODO Your Name
+ * \author Sungwoo Yang
  * \date 2025 Fall
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
@@ -61,7 +61,12 @@ namespace CS200
      */
     inline Math::TransformationMatrix build_ndc_matrix(Math::ivec2 view_size) noexcept
     {
-        // TODO implement the NDC matrix construction
-        return Math::TransformationMatrix{};
+        const Math::vec2        scale_factors = { 2.0 / static_cast<double>(view_size.x), 2.0 / static_cast<double>(view_size.y) };
+        const Math::ScaleMatrix scale_matrix(scale_factors);
+
+        const Math::vec2              tv = { -1.0, -1.0 };
+        const Math::TranslationMatrix translate_matrix(tv);
+
+        return translate_matrix * scale_matrix;
     }
 }

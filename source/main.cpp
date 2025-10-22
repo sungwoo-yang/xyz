@@ -5,7 +5,7 @@
  * \copyright DigiPen Institute of Technology
  */
 
-#include "Demo/DemoShapes.hpp"
+#include "Demo/DemoReflection.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Window.hpp"
@@ -62,8 +62,8 @@ EMSCRIPTEN_BINDINGS(main_window)
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     Engine& engine = Engine::Instance();
-    engine.Start("TODO CS200 HW5"); // TODO put your full name here
-    engine.GetGameStateManager().PushState<DemoShapes>();
+    engine.Start("Sungwoo Yang");
+    engine.GetGameStateManager().PushState<DemoLaserReflection>();
 
 #if !defined(__EMSCRIPTEN__)
     while (engine.HasGameEnded() == false)

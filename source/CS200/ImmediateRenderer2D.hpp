@@ -11,6 +11,7 @@
 #include "IRenderer2D.hpp"
 #include "OpenGL/Shader.hpp"
 #include "OpenGL/VertexArray.hpp"
+#include "Engine/Matrix.hpp"
 #include <array>
 
 namespace CS200
@@ -280,8 +281,16 @@ namespace CS200
         void DrawSDF(const Math::TransformationMatrix& transform, CS200::RGBA fill_color, CS200::RGBA line_color, double line_width, SDFShape sdf_shape);
 
     private:
-        // TODO Add private member variables for Texrured Quad related OpenGL handles and resources
+        struct Quad
+        {
+            OpenGL::BufferHandle      vertexBuffer{ 0 };
+            OpenGL::BufferHandle      indexBuffer{ 0 };
+            OpenGL::VertexArrayHandle vertexArray{ 0 };
+        } quad;
 
-        // TODO: Add private member variables for SDF related OpenGL handles and resources
+        OpenGL::CompiledShader     quadShader{};
+        Quad                       sdfQuad;
+        OpenGL::CompiledShader     sdfShader{};
+        Math::TransformationMatrix view_projection;
     };
 }
