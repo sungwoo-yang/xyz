@@ -7,6 +7,7 @@
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
+
 #pragma once
 #include "Vec2.hpp"
 
@@ -20,12 +21,12 @@ namespace Math
         constexpr double* operator[](int index)
         {
             return matrix[index];
-        };
+        }
 
         constexpr const double* operator[](int index) const
         {
             return matrix[index];
-        };
+        }
 
         TransformationMatrix  operator*(TransformationMatrix m) const;
         TransformationMatrix& operator*=(TransformationMatrix m);

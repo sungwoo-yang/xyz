@@ -149,8 +149,8 @@ namespace CS200
         Math::ivec2 GetSize() const noexcept;
 
     private:
-        RGBA* pixels = nullptr;
-        Math::ivec2 size{0, 0};
+        RGBA*       pixels = nullptr;
+        Math::ivec2 size{ 0, 0 };
     };
 
 }
