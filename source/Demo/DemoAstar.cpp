@@ -96,19 +96,18 @@ void DemoAstar::Update()
     // --- 대시 시작 시도 ---
     // bool justDashed = olimDash.TryStartDash(input, idleOlim.faceRight);
 
+    olimDash.TryStartDash(input, idleOlim.faceRight);
+
     // 1. 중력 적용
     bool applyGravity = true;
-
-    // 대시 중이고 중력 무시 옵션이 켜져 있으면 중력 적용 안 함
     if (olimDash.IsDashing() && olimDash.disableGravityOnDash)
     {
         applyGravity = false;
     }
-    // 플랫폼 위에 서 있고 아래로 내려가는 중이 아닐 때도 중력 적용 안 함
-    else if (!idleOlim.isJumping && idleOlim.currentPlatformIndex.has_value())
+    else if (!idleOlim.isJumping && idleOlim.currentPlatformIndex.has_value()) // 플랫폼 위에 있을 때
     {
         applyGravity       = false;
-        idleOlim.velocityY = 0.0; // 플랫폼 위에 있을 땐 Y속도 0 유지
+        idleOlim.velocityY = 0.0;
     }
 
     if (applyGravity)
@@ -128,9 +127,16 @@ void DemoAstar::Update()
     else // 대시 중이 아닐 때 일반 이동
     {
         if (input.KeyDown(CS230::Input::Keys::A))
+        {
             move.x -= 1.0;
+            idleOlim.faceRight = false;
+        }
+        idleOlim.faceRight = false;
         if (input.KeyDown(CS230::Input::Keys::D))
+        {
             move.x += 1.0;
+            idleOlim.faceRight = false;
+        }
         currentSpeedX = move.x * speed;
     }
 
@@ -237,6 +243,10 @@ void DemoAstar::Update()
     else if (idleOlim.isJumping) // 점프 애니메이션
     {
         newAnim = OlimAnimation::OlimJump;
+        if (currentSpeedX > 0.0)
+            idleOlim.faceRight = true;
+        else if (currentSpeedX < 0.0)
+            idleOlim.faceRight = false;
     }
     // 대시 중 아닐 때 좌우 이동 애니메이션
     else if (std::abs(currentSpeedX) > 0.01)
@@ -276,6 +286,29 @@ void DemoAstar::Draw() const
 
     // 캐릭터 그리기
     drawOlim(idleOlim);
+
+    if (olimDash.dashCooldownTimer > 0.0 && olimDash.dashCooldown > 0.0) // 쿨다운 중일 때만 그리기
+    {
+        // 게이지 비율 계산 (0.0 ~ 1.0)
+        double cooldownRatio = std::clamp(olimDash.dashCooldownTimer / olimDash.dashCooldown, 0.0, 1.0);
+
+        // 게이지 바 위치 계산 (캐릭터 발 아래)
+        Math::vec2 gaugeCenterPos = {
+            idleOlim.position.x,                                     // 캐릭터 X 위치 중앙
+            idleOlim.position.y - OLIM_HOT_SPOT.y - dashGaugeOffsetY // 캐릭터 발 아래 + 오프셋
+        };
+
+        // 1. 게이지 바 배경 그리기 (전체 너비)
+        Math::TransformationMatrix bgTransform = Math::TranslationMatrix(gaugeCenterPos) * Math::ScaleMatrix({ dashGaugeWidth, dashGaugeHeight });
+        renderer_2d.DrawRectangle(bgTransform, dashGaugeBgColor); // 배경색으로 채움
+
+        // 2. 게이지 바 전경(남은 쿨다운) 그리기 (비율에 따른 너비)
+        double                     fgWidth     = dashGaugeWidth * cooldownRatio;
+        // 전경 바는 왼쪽 정렬되어야 하므로 중앙 위치에서 왼쪽으로 (전체 너비 - 현재 너비)/2 만큼 이동
+        Math::vec2                 fgCenterPos = { gaugeCenterPos.x - (dashGaugeWidth - fgWidth) / 2.0, gaugeCenterPos.y };
+        Math::TransformationMatrix fgTransform = Math::TranslationMatrix(fgCenterPos) * Math::ScaleMatrix({ fgWidth, dashGaugeHeight });
+        renderer_2d.DrawRectangle(fgTransform, dashGaugeFgColor); // 전경색으로 채움
+    }
 
     renderer_2d.EndScene();
 }

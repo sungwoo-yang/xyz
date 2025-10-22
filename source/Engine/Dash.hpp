@@ -1,24 +1,24 @@
 #pragma once
 
-#include "Vec2.hpp"
 #include "Input.hpp" // Input 키 사용을 위해 포함
+#include "Vec2.hpp"
 
 namespace CS230
 {
     struct DashComponent
     {
         // Dash 상태
-        bool   isDashing = false;         // 현재 대시 중인지 여부
-        double dashTimer = 0.0;           // 남은 대시 시간
+        bool   isDashing         = false; // 현재 대시 중인지 여부
+        double dashTimer         = 0.0;   // 남은 대시 시간
         double dashCooldownTimer = 0.0;   // 남은 쿨다운 시간
-        int    dashDirection = 1;         // 대시 방향 (1: 오른쪽, -1: 왼쪽)
+        int    dashDirection     = 1;     // 대시 방향 (1: 오른쪽, -1: 왼쪽)
 
         // Dash 설정 값
-        double dashSpeed = 800.0;        // 대시 속도 (pixels/sec)
-        double dashDuration = 0.15;      // 대시 지속 시간 (sec)
-        double dashCooldown = 0.5;       // 대시 쿨다운 시간 (sec)
-        bool   disableGravityOnDash = true; // 대시 중 중력 무시 여부
-        Input::Keys dashKey = Input::Keys::K; // 대시 키 (TODO: Shift로 변경 필요)
+        double      dashSpeed            = 800.0;          // 대시 속도 (pixels/sec)
+        double      dashDuration         = 0.15;           // 대시 지속 시간 (sec)
+        double      dashCooldown         = 0.5;            // 대시 쿨다운 시간 (sec)
+        bool        disableGravityOnDash = true;           // 대시 중 중력 무시 여부
+        Input::Keys dashKey              = Input::Keys::K; // 대시 키 (TODO: Shift로 변경 필요)
 
         /**
          * @brief 매 프레임 대시 상태를 업데이트합니다 (쿨다운, 지속 시간).

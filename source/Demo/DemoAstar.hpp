@@ -108,4 +108,10 @@ private:
 
     // 추가: DashComponent 멤버
     CS230::DashComponent olimDash;
+
+    double      dashGaugeWidth   = 40.0;       // 게이지 바 전체 너비
+    double      dashGaugeHeight  = 5.0;        // 게이지 바 높이
+    double      dashGaugeOffsetY = 10.0;       // 캐릭터 발 아래로부터의 Y 오프셋
+    CS200::RGBA dashGaugeBgColor = 0x55555580; // 게이지 바 배경색 (어두운 회색, 반투명)
+    CS200::RGBA dashGaugeFgColor = 0x00BCD4FF;
 };
