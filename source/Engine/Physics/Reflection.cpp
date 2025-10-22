@@ -1,26 +1,26 @@
 #include "Reflection.hpp"
+#include "Engine/Vec2.hpp" // Math::vec2::Normalize() 사용 위해 추가
 #include <cmath>
 #include <limits>
 
-inline double dot(const Math::vec2& a, const Math::vec2& b)
+// --- 보조 함수 정의 추가 ---
+namespace // Anonymous namespace for helper functions local to this file
 {
-    return a.x * b.x + a.y * b.y;
-}
-
-inline Math::vec2 normalize(const Math::vec2& v)
-{
-    double len = v.Length();
-    if (len > std::numeric_limits<double>::epsilon())
+    // 내적 계산
+    inline double dot(const Math::vec2& a, const Math::vec2& b)
     {
-        return v / len;
+        return a.x * b.x + a.y * b.y;
     }
-    return Math::vec2{ 0.0, 0.0 };
-}
 
-inline Math::vec2 perpendicular(const Math::vec2& v)
-{
-    return Math::vec2{ -v.y, v.x };
-}
+    // 벡터에 수직인 벡터 계산 (시계 반대 방향 90도 회전)
+    inline Math::vec2 perpendicular(const Math::vec2& v)
+    {
+        return Math::vec2{ -v.y, v.x };
+    }
+} // end anonymous namespace
+
+// --- 보조 함수 정의 추가 끝 ---
+
 
 namespace Physics
 {
@@ -44,28 +44,31 @@ namespace Physics
         const double t = qmpxs / rxs;
         const double u = qmpxr / rxs;
 
+        // Use epsilon for floating point comparisons
         if (t >= -std::numeric_limits<double>::epsilon() && u >= -std::numeric_limits<double>::epsilon() && u <= 1.0 + std::numeric_limits<double>::epsilon())
         {
             outT            = t;
             outIntersection = p + r * t;
             return true;
         }
-
         return false;
     }
 
     Math::vec2 CalculateReflection(Math::vec2 incident, Math::vec2 normal)
     {
-        double     dot_product = dot(incident, normal);
-        Math::vec2 reflection  = incident - 2.0 * dot_product * normal;
-        return normalize(reflection);
+        Math::vec2 norm        = normal.Normalize();
+        double     dot_product = dot(incident, norm);
+        Math::vec2 reflection  = incident - 2.0 * dot_product * norm;
+        return reflection.Normalize();
     }
 
+    // --- parrySuccess 인자 제거 ---
     std::vector<std::pair<Math::vec2, Math::vec2>> CalculateLaserPath(Math::vec2 startPos, Math::vec2 initialDir, const std::vector<std::pair<Math::vec2, Math::vec2>>& segments, int maxBounces)
     {
         std::vector<std::pair<Math::vec2, Math::vec2>> path;
-        Math::vec2                                     currentPos = startPos;
-        Math::vec2                                     currentDir = normalize(initialDir);
+        Math::vec2                                     currentPos        = startPos;
+        Math::vec2                                     currentDir        = initialDir.Normalize();
+        const double                                   verySmallDistance = 1e-6;
 
         for (int bounce = 0; bounce <= maxBounces; ++bounce)
         {
@@ -76,18 +79,20 @@ namespace Physics
 
             for (size_t i = 0; i < segments.size(); ++i)
             {
+                // --- 관통 로직은 DemoReflection.cpp에서 처리하므로 여기서 제거 ---
+
                 Math::vec2 intersectionPoint;
                 double     t;
                 if (RaySegmentIntersection(currentPos, currentDir, segments[i].first, segments[i].second, intersectionPoint, t))
                 {
-                    if (t > 1e-6 && t < closestT)
+                    if (t > verySmallDistance && t < closestT)
                     {
                         closestT                = t;
                         closestIntersection     = intersectionPoint;
                         intersectedSegmentIndex = static_cast<int>(i);
 
                         Math::vec2 segmentVec = segments[i].second - segments[i].first;
-                        Math::vec2 normal     = normalize(perpendicular(segmentVec));
+                        Math::vec2 normal     = perpendicular(segmentVec).Normalize();
 
                         if (dot(normal, -currentDir) < 0)
                         {
@@ -101,7 +106,7 @@ namespace Physics
             if (intersectedSegmentIndex != -1)
             {
                 path.push_back({ currentPos, closestIntersection });
-                currentPos = closestIntersection;
+                currentPos = closestIntersection + surfaceNormal * verySmallDistance;
                 currentDir = CalculateReflection(currentDir, surfaceNormal);
             }
             else
@@ -111,8 +116,7 @@ namespace Physics
                 break;
             }
         }
-
         return path;
     }
 
-}
+} // namespace Physics

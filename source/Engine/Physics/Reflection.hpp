@@ -10,6 +10,7 @@ namespace Physics
 
     Math::vec2 CalculateReflection(Math::vec2 incident, Math::vec2 normal);
 
+    // --- parrySuccess 인자 제거 (DemoReflection.cpp에서 처리) ---
     std::vector<std::pair<Math::vec2, Math::vec2>> CalculateLaserPath(Math::vec2 startPos, Math::vec2 initialDir, const std::vector<std::pair<Math::vec2, Math::vec2>>& segments, int maxBounces = 5);
 
 }
