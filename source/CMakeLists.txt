@@ -16,13 +16,10 @@ set(SOURCE_CODE
     CS200/RenderingAPI.hpp CS200/RenderingAPI.cpp
     CS200/RGBA.hpp
 
-    Demo/DemoAstar.hpp Demo/DemoAstar.cpp
     Demo/DemoShapes.hpp Demo/DemoShapes.cpp
     Demo/DemoFramebuffer.hpp Demo/DemoFramebuffer.cpp
-    Demo/DemoReflection.hpp Demo/DemoReflection.cpp
     Demo/DemoText.hpp Demo/DemoText.cpp
 
-    Engine/Dash.hpp Engine/Dash.cpp
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp
     Engine/Font.hpp Engine/Font.cpp
@@ -40,7 +37,6 @@ set(SOURCE_CODE
     Engine/Timer.hpp
     Engine/Vec2.hpp Engine/Vec2.cpp
     Engine/Window.hpp Engine/Window.cpp
-    Engine/Physics/Reflection.hpp Engine/Physics/Reflection.cpp
 
     OpenGL/Buffer.hpp OpenGL/Buffer.cpp
     OpenGL/Environment.hpp
