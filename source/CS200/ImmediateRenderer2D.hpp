@@ -8,10 +8,10 @@
  */
 #pragma once
 
+#include "Engine/Matrix.hpp"
 #include "IRenderer2D.hpp"
 #include "OpenGL/Shader.hpp"
 #include "OpenGL/VertexArray.hpp"
-#include "Engine/Matrix.hpp"
 #include <array>
 
 namespace CS200
