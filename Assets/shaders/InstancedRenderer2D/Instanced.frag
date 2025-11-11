@@ -10,6 +10,7 @@ precision mediump sampler2D;
  * \copyright DigiPen Institute of Technology
  */
 
+
 in vec2 v_uv;
 in vec4 v_color;
 flat in float v_tex_id;
@@ -42,8 +43,9 @@ void main()
         case 15: tex_color = texture(u_textures[15], v_uv); break;
         default: tex_color = vec4(1.0, 0.0, 1.0, 1.0);
     }
-
+    
     frag_color = tex_color * v_color;
+
     if (frag_color.a < 0.01)
     {
         discard;

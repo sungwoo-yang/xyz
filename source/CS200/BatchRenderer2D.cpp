@@ -188,15 +188,12 @@ namespace CS200
     void BatchRenderer2D::DrawCircle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
-
     void BatchRenderer2D::DrawRectangle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
-
     void BatchRenderer2D::DrawLine(const Math::TransformationMatrix&, Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }
-
     void BatchRenderer2D::DrawLine(Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }

@@ -15,10 +15,12 @@ set(SOURCE_CODE
     CS200/Renderer2DUtils.hpp CS200/Renderer2DUtils.cpp
     CS200/RenderingAPI.hpp CS200/RenderingAPI.cpp
     CS200/RGBA.hpp
+    CS200/BatchRenderer2D.hpp CS200/BatchRenderer2D.cpp
+    CS200/InstancedRenderer2D.hpp CS200/InstancedRenderer2D.cpp
 
     Demo/DemoShapes.hpp Demo/DemoShapes.cpp
-    Demo/DemoFramebuffer.hpp Demo/DemoFramebuffer.cpp
-    Demo/DemoText.hpp Demo/DemoText.cpp
+    Demo/DemoBatchRendering.hpp Demo/DemoBatchRendering.cpp
+    Demo/DemoInstancedRendering.hpp Demo/DemoInstancedRendering.cpp
 
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp

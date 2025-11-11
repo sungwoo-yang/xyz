@@ -1,10 +1,11 @@
 /**
  * \file
- * \author Sungwoo Yang (based on CS200 Homework 6)
+ * \author Sungwoo Yang
  * \date 2025 Fall
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
+
 #include "InstancedRenderer2D.hpp"
 #include "Engine/Matrix.hpp"
 #include "Engine/Texture.hpp"
@@ -57,10 +58,14 @@ namespace CS200
             m_UnitQuadVBO, { OpenGL::Attribute::Float2, OpenGL::Attribute::Float2 }
         };
 
+        auto inst_float3 = OpenGL::Attribute::Float3;
+        auto inst_float4 = OpenGL::Attribute::Float4;
+        auto inst_float  = OpenGL::Attribute::Float;
+
         OpenGL::VertexBuffer instanceLayout{
             m_InstanceVBO,
-            { OpenGL::Attribute::Float3.WithDivisor(1), OpenGL::Attribute::Float3.WithDivisor(1), OpenGL::Attribute::Float3.WithDivisor(1), OpenGL::Attribute::Float3.WithDivisor(1),
-              OpenGL::Attribute::Float3.WithDivisor(1), OpenGL::Attribute::Float3.WithDivisor(1), OpenGL::Attribute::Float4.WithDivisor(1), OpenGL::Attribute::Float.WithDivisor(1) }
+            { inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1),
+              inst_float4.WithDivisor(1), inst_float.WithDivisor(1) }
         };
 
         m_VAO = OpenGL::CreateVertexArrayObject({ unitQuadLayout, instanceLayout }, m_EBO);
@@ -185,12 +190,15 @@ namespace CS200
     void InstancedRenderer2D::DrawCircle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
+
     void InstancedRenderer2D::DrawRectangle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
+
     void InstancedRenderer2D::DrawLine(const Math::TransformationMatrix&, Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }
+
     void InstancedRenderer2D::DrawLine(Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }

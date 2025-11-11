@@ -12,8 +12,8 @@
 #include "CS200/NDC.hpp"
 #include "CS200/RGBA.hpp"
 #include "CS200/RenderingAPI.hpp"
-#include "DemoFramebuffer.hpp"
-#include "DemoText.hpp"
+#include "DemoBatchRendering.hpp"
+#include "DemoInstancedRendering.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Input.hpp"
@@ -205,15 +205,15 @@ void DemoShapes::DrawImGui()
         ImGui::Text("Current Shape: %s", getShapeTypeString());
 
         ImGui::SeparatorText("Switch Demo");
-        if (ImGui::Button("Switch to Demo Framebuffer"))
+        if (ImGui::Button("Switch to Batch Rendering"))
         {
             Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoFramebuffer>();
+            Engine::GetGameStateManager().PushState<DemoBatchRendering>();
         }
-        if (ImGui::Button("Switch to Demo Text"))
+        if (ImGui::Button("Switch to Instanced Rendering"))
         {
             Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoText>();
+            Engine::GetGameStateManager().PushState<DemoInstancedRendering>();
         }
     }
     ImGui::End();

@@ -5,8 +5,8 @@
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
-#pragma once
 
+#pragma once
 #include "CS200/InstancedRenderer2D.hpp"
 #include "Engine/GameState.hpp"
 #include "Engine/Texture.hpp"
@@ -15,7 +15,6 @@
 #include <memory>
 #include <vector>
 
-// DemoInstancedRendering.hpp
 class DemoInstancedRendering : public CS230::GameState
 {
 public:
@@ -45,5 +44,5 @@ private:
     int m_SpriteCount = 10000;
     bool m_Animate = true;
 
-    Math::ivec2 m_ScreenSize;
+    mutable Math::ivec2 m_ScreenSize;
 };

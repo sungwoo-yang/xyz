@@ -1,18 +1,16 @@
 /**
  * \file
- * \author Sungwoo Yang (based on CS200 Homework 6)
+ * \author Sungwoo Yang
  * \date 2025 Fall
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
-#include "DemoBatchRendering.hpp"
 
+#include "DemoBatchRendering.hpp"
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
-#include "DemoFramebuffer.hpp"
 #include "DemoInstancedRendering.hpp"
 #include "DemoShapes.hpp"
-#include "DemoText.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Random.hpp"
@@ -25,7 +23,7 @@ void DemoBatchRendering::Load()
     m_Renderer.Init();
     CS200::RenderingAPI::SetClearColor(0x1a1a1aff);
 
-    m_TextureCat = Engine::GetTextureManager().Load("Assets/images/DemoFramebuffer/Cat.png");
+    m_TextureCat   = Engine::GetTextureManager().Load("Assets/images/DemoFramebuffer/Cat.png");
     m_TextureRobot = Engine::GetTextureManager().Load("Assets/images/DemoFramebuffer/Robot.png");
 
     m_ScreenSize = Engine::GetWindow().GetSize();
@@ -33,27 +31,27 @@ void DemoBatchRendering::Load()
     m_Sprites.resize(m_SpriteCount);
     for (int i = 0; i < m_SpriteCount; ++i)
     {
-        auto& sprite = m_Sprites[i];
+        auto& sprite    = m_Sprites[i];
         sprite.position = { util::random(0.0, static_cast<double>(m_ScreenSize.x)), util::random(0.0, static_cast<double>(m_ScreenSize.y)) };
         sprite.velocity = { util::random(-100.0, 100.0), util::random(-100.0, 100.0) };
         sprite.rotation = util::random(0.0, 3.14159 * 2.0);
-        sprite.tint = CS200::pack_color({ (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), 1.0f });
+        sprite.tint     = CS200::pack_color({ (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), 1.0f });
     }
 }
 
 void DemoBatchRendering::Update()
 {
-    if (!m_Animate) return;
+    if (!m_Animate)
+        return;
 
     const double dt = Engine::GetWindowEnvironment().DeltaTime;
-    m_ScreenSize = Engine::GetWindow().GetSize(); // 윈도우 크기 변경 감지
+    m_ScreenSize    = Engine::GetWindow().GetSize();
 
     for (auto& sprite : m_Sprites)
     {
         sprite.position += sprite.velocity * dt;
         sprite.rotation += dt * 0.5;
 
-        // 화면 바운더리 체크
         if (sprite.position.x < 0 || sprite.position.x > m_ScreenSize.x)
         {
             sprite.velocity.x *= -1;
@@ -77,36 +75,30 @@ void DemoBatchRendering::Draw() const
     CS200::RenderingAPI::Clear();
     m_ScreenSize = Engine::GetWindow().GetSize();
 
-    // const_cast는 일반적으로 좋지 않지만, Draw 함수는 const인데 렌더러는 상태를 변경해야 함
     auto& renderer = const_cast<CS200::BatchRenderer2D&>(m_Renderer);
 
     renderer.BeginScene(CS200::build_ndc_matrix(m_ScreenSize));
 
-    const Math::ivec2 catFrameSize = { 128, 128 };
+    const Math::ivec2 catFrameSize   = { 128, 128 };
     const Math::ivec2 robotFrameSize = { 63, 127 };
-    const Math::ivec2 catTexelPos = { 0, 0 };
-    const Math::ivec2 robotTexelPos = { 0, 0 };
-    
+    const Math::ivec2 catTexelPos    = { 0, 0 };
+    const Math::ivec2 robotTexelPos  = { 0, 0 };
+
     for (int i = 0; i < m_SpriteCount; ++i)
     {
         const auto& sprite = m_Sprites[i];
-        
-        // 절반은 고양이, 절반은 로봇
+
         if (i % 2 == 0)
         {
-            Math::TransformationMatrix transform = 
-                Math::TranslationMatrix(sprite.position) *
-                Math::RotationMatrix(sprite.rotation) *
-                Math::ScaleMatrix({ (double)catFrameSize.x, (double)catFrameSize.y });
-            
+            Math::TransformationMatrix transform =
+                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({ (double)catFrameSize.x, (double)catFrameSize.y });
+
             renderer.DrawQuad(transform, m_TextureCat->GetHandle(), { 0.0, 0.0 }, { 128.0 / 640.0, 128.0 / 256.0 }, sprite.tint);
         }
         else
         {
-            Math::TransformationMatrix transform = 
-                Math::TranslationMatrix(sprite.position) *
-                Math::RotationMatrix(sprite.rotation) *
-                Math::ScaleMatrix({ (double)robotFrameSize.x, (double)robotFrameSize.y });
+            Math::TransformationMatrix transform =
+                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({ (double)robotFrameSize.x, (double)robotFrameSize.y });
 
             renderer.DrawQuad(transform, m_TextureRobot->GetHandle(), { 0.0, 0.0 }, { 63.0 / 315.0, 1.0 }, sprite.tint);
         }
@@ -123,7 +115,7 @@ void DemoBatchRendering::DrawImGui()
         ImGui::Text("FPS: %d", Engine::GetWindowEnvironment().FPS);
         ImGui::Text("Sprite Count: %d", m_SpriteCount);
         ImGui::Checkbox("Animate", &m_Animate);
-        
+
         ImGui::SeparatorText("Switch Demo");
         if (ImGui::Button("Switch to Immediate Mode (Shapes)"))
         {

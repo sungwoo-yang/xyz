@@ -1,12 +1,12 @@
 /**
  * \file
- * \author Sungwoo Yang (based on CS200 Homework 6)
+ * \author Sungwoo Yang
  * \date 2025 Fall
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
-#pragma once
 
+#pragma once
 #include "CS200/BatchRenderer2D.hpp"
 #include "Engine/GameState.hpp"
 #include "Engine/Texture.hpp"
@@ -45,5 +45,5 @@ private:
     int m_SpriteCount = 10000;
     bool m_Animate = true;
 
-    Math::ivec2 m_ScreenSize;
+    mutable Math::ivec2 m_ScreenSize;
 };

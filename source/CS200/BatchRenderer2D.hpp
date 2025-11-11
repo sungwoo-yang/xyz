@@ -19,7 +19,7 @@ namespace CS200
     class BatchRenderer2D : public IRenderer2D
     {
     public:
-        BatchRenderer2D() = default;
+        BatchRenderer2D();
         ~BatchRenderer2D() override;
 
         BatchRenderer2D(const BatchRenderer2D& other)                = delete;
@@ -32,7 +32,7 @@ namespace CS200
         void BeginScene(const Math::TransformationMatrix& view_projection) override;
         void EndScene() override;
         void DrawQuad(const Math::TransformationMatrix& transform, OpenGL::TextureHandle texture, Math::vec2 texture_coord_bl, Math::vec2 texture_coord_tr, CS200::RGBA tintColor) override;
-        
+
         void DrawCircle(const Math::TransformationMatrix& transform, CS200::RGBA fill_color, CS200::RGBA line_color, double line_width) override;
         void DrawRectangle(const Math::TransformationMatrix& transform, CS200::RGBA fill_color, CS200::RGBA line_color, double line_width) override;
         void DrawLine(const Math::TransformationMatrix& transform, Math::vec2 start_point, Math::vec2 end_point, CS200::RGBA line_color, double line_width) override;

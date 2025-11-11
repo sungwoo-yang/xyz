@@ -5,14 +5,12 @@
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
-#include "DemoInstancedRendering.hpp"
 
+#include "DemoInstancedRendering.hpp"
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
 #include "DemoBatchRendering.hpp"
-#include "DemoFramebuffer.hpp"
 #include "DemoShapes.hpp"
-#include "DemoText.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Random.hpp"
@@ -46,14 +44,13 @@ void DemoInstancedRendering::Update()
     if (!m_Animate) return;
 
     const double dt = Engine::GetWindowEnvironment().DeltaTime;
-    m_ScreenSize = Engine::GetWindow().GetSize(); // 윈도우 크기 변경 감지
+    m_ScreenSize = Engine::GetWindow().GetSize();
 
     for (auto& sprite : m_Sprites)
     {
         sprite.position += sprite.velocity * dt;
         sprite.rotation += dt * 0.5;
 
-        // 화면 바운더리 체크
         if (sprite.position.x < 0 || sprite.position.x > m_ScreenSize.x)
         {
             sprite.velocity.x *= -1;
