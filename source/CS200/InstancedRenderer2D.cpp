@@ -98,6 +98,7 @@ namespace CS200
 
     void InstancedRenderer2D::BeginScene(const Math::TransformationMatrix& view_projection)
     {
+        m_drawCallCount = 0;
         m_ViewProjection = view_projection;
         StartBatch();
     }
@@ -129,7 +130,8 @@ namespace CS200
         GL::UniformMatrix3fv(m_Shader.UniformLocations.at("u_ndc_matrix"), 1, GL_FALSE, gl_vp_matrix.data());
 
         GL::DrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_InstanceCount));
-
+        m_drawCallCount++;
+        
         GL::BindVertexArray(0);
         GL::UseProgram(0);
     }

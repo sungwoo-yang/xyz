@@ -101,6 +101,7 @@ namespace CS200
 
     void ImmediateRenderer2D::BeginScene(const Math::TransformationMatrix& view_projection_matrix)
     {
+        m_drawCallCount          = 0;
         view_projection          = view_projection_matrix;
         const auto to_ndc_opengl = Renderer2DUtils::to_opengl_mat3(view_projection);
 
@@ -139,7 +140,8 @@ namespace CS200
         GL::Uniform4fv(locations.at("u_tint_color"), 1, color.data());
 
         GL::DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
-
+        m_drawCallCount++;
+        
         GL::BindTexture(GL_TEXTURE_2D, 0);
         GL::BindVertexArray(0);
         GL::UseProgram(0);
@@ -187,6 +189,7 @@ namespace CS200
         GL::Uniform1i(locations.at("u_shape_type"), static_cast<int>(sdf_shape));
 
         GL::DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+        m_drawCallCount++;
 
         GL::BindVertexArray(0);
         GL::UseProgram(0);

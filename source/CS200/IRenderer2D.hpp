@@ -194,6 +194,14 @@ namespace CS200
          *
          */
         virtual void DrawLine(Math::vec2 start_point, Math::vec2 end_point, CS200::RGBA line_color = CS200::WHITE, double line_width = 2.0) = 0;
+
+        virtual uint32_t GetDrawCallCount() const
+        {
+            return m_drawCallCount;
+        }
+
+    protected:
+        uint32_t m_drawCallCount = 0;
     };
 
 }

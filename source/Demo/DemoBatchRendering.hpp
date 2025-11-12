@@ -15,7 +15,6 @@
 #include <memory>
 #include <vector>
 
-// DemoBatchRendering.hpp
 class DemoBatchRendering : public CS230::GameState
 {
 public:
@@ -33,7 +32,15 @@ private:
         Math::vec2  velocity;
         double      rotation = 0.0;
         CS200::RGBA tint;
+
+        bool        is_cat;
+        Math::vec2  uv_bl;
+        Math::vec2  uv_tr;
+        Math::ivec2 frame_size;
     };
+
+    void InitializeSprite(Sprite& sprite);
+    void ChangeSpriteCount(int new_count);
 
     CS200::BatchRenderer2D m_Renderer;
 
@@ -42,7 +49,7 @@ private:
 
     std::vector<Sprite> m_Sprites;
 
-    int  m_SpriteCount = 15000;
+    int  m_SpriteCount = 1;
     bool m_Animate     = true;
 
     mutable Math::ivec2 m_ScreenSize;

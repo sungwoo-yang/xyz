@@ -92,6 +92,7 @@ namespace CS200
 
     void BatchRenderer2D::BeginScene(const Math::TransformationMatrix& view_projection)
     {
+        m_drawCallCount = 0;
         m_ViewProjection = view_projection;
         StartBatch();
     }
@@ -123,7 +124,8 @@ namespace CS200
         GL::UniformMatrix3fv(m_Shader.UniformLocations.at("u_ndc_matrix"), 1, GL_FALSE, gl_vp_matrix.data());
 
         GL::DrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_IndexCount), GL_UNSIGNED_INT, nullptr);
-
+        m_drawCallCount++;
+        
         GL::BindVertexArray(0);
         GL::UseProgram(0);
     }
