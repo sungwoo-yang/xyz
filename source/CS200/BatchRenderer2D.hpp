@@ -59,9 +59,8 @@ namespace CS200
         std::vector<QuadVertex> m_Vertices;
         uint32_t                m_IndexCount = 0;
 
-        static constexpr uint32_t                            MAX_TEXTURE_SLOTS = 16;
-        std::array<OpenGL::TextureHandle, MAX_TEXTURE_SLOTS> m_TextureSlots{};
-        uint32_t                                             m_TextureSlotIndex = 1;
+        std::vector<OpenGL::TextureHandle> m_TextureSlots;
+        uint32_t                           m_TextureSlotIndex = 1;
 
         static constexpr uint32_t MAX_QUADS_PER_BATCH    = 10000;
         static constexpr uint32_t MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH * 4;

@@ -9,9 +9,7 @@
 #include "DemoCreativeScene.hpp"
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
-#include "DemoBatchRendering.hpp"
-#include "DemoInstancedRendering.hpp"
-#include "DemoShapes.hpp"
+#include "DemoPerformance.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Random.hpp"
@@ -123,20 +121,10 @@ void DemoCreativeScene::DrawImGui()
         ImGui::Text("Star Count: %zu", m_stars.size());
 
         ImGui::SeparatorText("Switch Demo");
-        if (ImGui::Button("Switch to Immediate Mode (Shapes)"))
+        if (ImGui::Button("Switch to Performance Demo"))
         {
             Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoShapes>();
-        }
-        if (ImGui::Button("Switch to Batch Rendering"))
-        {
-            Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoBatchRendering>();
-        }
-        if (ImGui::Button("Switch to Instanced Rendering"))
-        {
-            Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoInstancedRendering>();
+            Engine::GetGameStateManager().PushState<DemoPerformance>();
         }
     }
     ImGui::End();

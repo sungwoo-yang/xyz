@@ -62,9 +62,8 @@ namespace CS200
         std::vector<InstanceData> m_InstanceData;
         uint32_t                  m_InstanceCount = 0;
 
-        static constexpr uint32_t                            MAX_TEXTURE_SLOTS = 16;
-        std::array<OpenGL::TextureHandle, MAX_TEXTURE_SLOTS> m_TextureSlots{};
-        uint32_t                                             m_TextureSlotIndex = 1;
+        std::vector<OpenGL::TextureHandle> m_TextureSlots;
+        uint32_t                           m_TextureSlotIndex = 1;
 
         static constexpr uint32_t MAX_INSTANCES_PER_BATCH = 10000;
 

@@ -1,13 +1,13 @@
 /**
  * \file
- * \author Sungwoo Yang (based on CS200 Homework 6)
+ * \author Sungwoo Yang
  * \date 2025 Fall
  * \par CS200 Computer Graphics I
  * \copyright DigiPen Institute of Technology
  */
 
 #pragma once
-#include "CS200/InstancedRenderer2D.hpp"
+#include "CS200/IRenderer2D.hpp"
 #include "Engine/GameState.hpp"
 #include "Engine/Texture.hpp"
 #include "Engine/Vec2.hpp"
@@ -15,7 +15,14 @@
 #include <memory>
 #include <vector>
 
-class DemoInstancedRendering : public CS230::GameState
+enum class RendererType
+{
+    Immediate,
+    Batch,
+    Instanced
+};
+
+class DemoPerformance : public CS230::GameState
 {
 public:
     void          Load() override;
@@ -33,7 +40,7 @@ private:
         double      rotation = 0.0;
         CS200::RGBA tint;
 
-        bool        is_cat;
+        int         textureIndex;
         Math::vec2  uv_bl;
         Math::vec2  uv_tr;
         Math::ivec2 frame_size;
@@ -41,13 +48,13 @@ private:
 
     void InitializeSprite(Sprite& sprite);
     void ChangeSpriteCount(int new_count);
+    void SwitchRenderer(RendererType type);
 
-    CS200::InstancedRenderer2D m_Renderer;
+    std::unique_ptr<CS200::IRenderer2D> m_Renderer;
+    RendererType                        m_CurrentRenderer = RendererType::Immediate;
 
-    std::shared_ptr<CS230::Texture> m_TextureCat;
-    std::shared_ptr<CS230::Texture> m_TextureRobot;
-
-    std::vector<Sprite> m_Sprites;
+    std::vector<std::shared_ptr<CS230::Texture>> m_SpriteTextures;
+    std::vector<Sprite>                          m_Sprites;
 
     int  m_SpriteCount = 1;
     bool m_Animate     = true;

@@ -6,29 +6,32 @@
  * \copyright DigiPen Institute of Technology
  */
 
-#include "DemoBatchRendering.hpp"
+#include "DemoPerformance.hpp"
+#include "CS200/BatchRenderer2D.hpp"
+#include "CS200/ImmediateRenderer2D.hpp"
+#include "CS200/InstancedRenderer2D.hpp"
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
-#include "DemoInstancedRendering.hpp"
-#include "DemoShapes.hpp"
+#include "DemoCreativeScene.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Random.hpp"
 #include "Engine/TextureManager.hpp"
 #include "Engine/Window.hpp"
-#include "DemoCreativeScene.hpp"
 #include <imgui.h>
 
-void DemoBatchRendering::InitializeSprite(Sprite& sprite)
+void DemoPerformance::InitializeSprite(Sprite& sprite)
 {
+    m_ScreenSize = Engine::GetWindow().GetSize();
+
     sprite.position = { util::random(0.0, static_cast<double>(m_ScreenSize.x)), util::random(0.0, static_cast<double>(m_ScreenSize.y)) };
     sprite.velocity = { util::random(-100.0, 100.0), util::random(-100.0, 100.0) };
     sprite.rotation = util::random(0.0, 3.14159 * 2.0);
     sprite.tint     = CS200::pack_color({ static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), 1.0f });
 
-    sprite.is_cat = util::random(0, 2) == 0;
+    sprite.textureIndex = util::random(0, static_cast<int>(m_SpriteTextures.size())); // <-- 수정
 
-    if (sprite.is_cat)
+    if (sprite.textureIndex % 2 == 0)
     {
         const int    frame_cols   = 5;
         const double sheet_width  = 640.0;
@@ -57,7 +60,7 @@ void DemoBatchRendering::InitializeSprite(Sprite& sprite)
     }
 }
 
-void DemoBatchRendering::ChangeSpriteCount(int new_count)
+void DemoPerformance::ChangeSpriteCount(int new_count)
 {
     const int max_sprites = 200000;
     new_count             = std::clamp(new_count, 0, max_sprites);
@@ -79,13 +82,43 @@ void DemoBatchRendering::ChangeSpriteCount(int new_count)
     m_SpriteCount = new_count;
 }
 
-void DemoBatchRendering::Load()
+void DemoPerformance::SwitchRenderer(RendererType type)
 {
-    m_Renderer.Init();
+    if (m_Renderer && m_CurrentRenderer == type)
+        return;
+
+    if (m_Renderer)
+    {
+        m_Renderer->Shutdown();
+        m_Renderer.reset();
+    }
+
+    m_CurrentRenderer = type;
+    switch (type)
+    {
+        case RendererType::Immediate: m_Renderer = std::make_unique<CS200::ImmediateRenderer2D>(); break;
+        case RendererType::Batch: m_Renderer = std::make_unique<CS200::BatchRenderer2D>(); break;
+        case RendererType::Instanced: m_Renderer = std::make_unique<CS200::InstancedRenderer2D>(); break;
+    }
+
+    if (m_Renderer)
+    {
+        m_Renderer->Init();
+    }
+}
+
+void DemoPerformance::Load()
+{
     CS200::RenderingAPI::SetClearColor(0x1a1a1aff);
 
-    m_TextureCat   = Engine::GetTextureManager().Load("Assets/images/DemoFramebuffer/Cat.png");
-    m_TextureRobot = Engine::GetTextureManager().Load("Assets/images/DemoFramebuffer/Robot.png");
+    for (int i = 1; i <= 64; ++i)
+    {
+        std::string num = std::to_string(i);
+        if (i < 10)
+            num = "0" + num;
+        std::string path = "Assets/images/variations/robot_var_" + num + ".png";
+        m_SpriteTextures.push_back(Engine::GetTextureManager().Load(path));
+    }
 
     m_ScreenSize = Engine::GetWindow().GetSize();
 
@@ -93,15 +126,12 @@ void DemoBatchRendering::Load()
     for (int i = 0; i < m_SpriteCount; ++i)
     {
         InitializeSprite(m_Sprites[static_cast<size_t>(i)]);
-        auto& sprite    = m_Sprites[static_cast<size_t>(i)];
-        sprite.position = { util::random(0.0, static_cast<double>(m_ScreenSize.x)), util::random(0.0, static_cast<double>(m_ScreenSize.y)) };
-        sprite.velocity = { util::random(-100.0, 100.0), util::random(-100.0, 100.0) };
-        sprite.rotation = util::random(0.0, 3.14159 * 2.0);
-        sprite.tint     = CS200::pack_color({ static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), 1.0f });
     }
+
+    SwitchRenderer(m_CurrentRenderer);
 }
 
-void DemoBatchRendering::Update()
+void DemoPerformance::Update()
 {
     if (!m_Animate)
         return;
@@ -127,51 +157,57 @@ void DemoBatchRendering::Update()
     }
 }
 
-void DemoBatchRendering::Unload()
+void DemoPerformance::Unload()
 {
-    m_Renderer.Shutdown();
+    m_Renderer->Shutdown();
 }
 
-void DemoBatchRendering::Draw() const
+void DemoPerformance::Draw() const
 {
     CS200::RenderingAPI::Clear();
     m_ScreenSize = Engine::GetWindow().GetSize();
 
-    auto& renderer = const_cast<CS200::BatchRenderer2D&>(m_Renderer);
+    auto& renderer = *m_Renderer;
 
     renderer.BeginScene(CS200::build_ndc_matrix(m_ScreenSize));
 
     for (int i = 0; i < m_SpriteCount; ++i)
     {
-        const auto& sprite = m_Sprites[static_cast<size_t>(i)];
+        const auto& sprite  = m_Sprites[static_cast<size_t>(i)];
+        const auto& texture = m_SpriteTextures[sprite.textureIndex];
 
-        if (sprite.is_cat)
-        {
-            Math::TransformationMatrix transform = Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) *
-                                                   Math::ScaleMatrix({ static_cast<double>(sprite.frame_size.x), static_cast<double>(sprite.frame_size.y) });
+        Math::TransformationMatrix transform = Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) *
+                                               Math::ScaleMatrix({ static_cast<double>(sprite.frame_size.x), static_cast<double>(sprite.frame_size.y) });
 
-            renderer.DrawQuad(transform, m_TextureCat->GetHandle(), sprite.uv_bl, sprite.uv_tr, sprite.tint);
-        }
-        else
-        {
-            Math::TransformationMatrix transform = Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) *
-                                                   Math::ScaleMatrix({ static_cast<double>(sprite.frame_size.x), static_cast<double>(sprite.frame_size.y) });
-
-            renderer.DrawQuad(transform, m_TextureRobot->GetHandle(), sprite.uv_bl, sprite.uv_tr, sprite.tint);
-        }
+        renderer.DrawQuad(transform, texture->GetHandle(), sprite.uv_bl, sprite.uv_tr, sprite.tint);
     }
 
     renderer.EndScene();
 }
 
-void DemoBatchRendering::DrawImGui()
+void DemoPerformance::DrawImGui()
 {
     if (ImGui::Begin("Demo Controls"))
     {
-        ImGui::Text("Renderer: BatchRenderer2D");
+        ImGui::Text("Renderer: ");
+        if (ImGui::RadioButton("Immediate", m_CurrentRenderer == RendererType::Immediate))
+        {
+            SwitchRenderer(RendererType::Immediate);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Batch", m_CurrentRenderer == RendererType::Batch))
+        {
+            SwitchRenderer(RendererType::Batch);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Instanced", m_CurrentRenderer == RendererType::Instanced))
+        {
+            SwitchRenderer(RendererType::Instanced);
+        }
+
         ImGui::Text("FPS: %d", Engine::GetWindowEnvironment().FPS);
         ImGui::Text("Sprite Count: %d", m_SpriteCount);
-        ImGui::Text("Draw Calls: %u", m_Renderer.GetDrawCallCount());
+        ImGui::Text("Draw Calls: %u", m_Renderer->GetDrawCallCount());
         ImGui::Checkbox("Animate", &m_Animate);
 
         ImGui::SeparatorText("Sprite Count");
@@ -230,19 +266,7 @@ void DemoBatchRendering::DrawImGui()
             ChangeSpriteCount(0);
         }
 
-
-        ImGui::SeparatorText("Switch Demo");
-        if (ImGui::Button("Switch to Immediate Mode (Shapes)"))
-        {
-            Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoShapes>();
-        }
-        if (ImGui::Button("Switch to Instanced Rendering"))
-        {
-            Engine::GetGameStateManager().PopState();
-            Engine::GetGameStateManager().PushState<DemoInstancedRendering>();
-        }
-        if (ImGui::Button("Switch to Creative Scene (Demo 2)"))
+        if (ImGui::Button("Switch to Creative Scene"))
         {
             Engine::GetGameStateManager().PopState();
             Engine::GetGameStateManager().PushState<DemoCreativeScene>();
@@ -251,7 +275,7 @@ void DemoBatchRendering::DrawImGui()
     ImGui::End();
 }
 
-gsl::czstring DemoBatchRendering::GetName() const
+gsl::czstring DemoPerformance::GetName() const
 {
     return "Demo Batch Rendering";
 }

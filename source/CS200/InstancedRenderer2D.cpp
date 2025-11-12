@@ -8,10 +8,14 @@
 
 #include "InstancedRenderer2D.hpp"
 #include "Engine/Matrix.hpp"
+#include "Engine/Path.hpp"
 #include "Engine/Texture.hpp"
 #include "OpenGL/Buffer.hpp"
 #include "OpenGL/GL.hpp"
 #include "Renderer2DUtils.hpp"
+#include <fstream>
+#include <numeric>
+#include <sstream>
 #include <utility>
 
 namespace CS200
@@ -45,14 +49,35 @@ namespace CS200
     }
 
     void InstancedRenderer2D::Init()
-    {
-        m_Shader = OpenGL::CreateShader(std::filesystem::path("Assets/shaders/InstancedRenderer2D/instanced.vert"), std::filesystem::path("Assets/shaders/InstancedRenderer2D/instanced.frag"));
+    { 
+        GLint max_tex_units = 0;
+        GL::GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
+        m_TextureSlots.resize(std::min(max_tex_units, 32));
+
+        const std::filesystem::path vertex_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/instanced.vert");
+        std::ifstream               vert_stream(vertex_file);
+        std::stringstream           vert_text_stream;
+        vert_text_stream << vert_stream.rdbuf();
+        const std::string vertex_glsl = vert_text_stream.str();
+
+        const std::filesystem::path fragment_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/instanced.frag");
+        std::ifstream               frag_stream(fragment_file);
+        std::stringstream           frag_text_stream;
+        frag_text_stream << frag_stream.rdbuf();
+        std::string frag_glsl = frag_text_stream.str();
+
+        const size_t first_newline = frag_glsl.find('\n');
+        if (first_newline != std::string::npos)
+        {
+            const std::string define_line = "\n#define MAX_TEXTURE_SLOTS " + std::to_string(m_TextureSlots.size()) + "\n";
+            frag_glsl.insert(first_newline + 1, define_line);
+        }
+
+        m_Shader = OpenGL::CreateShader(std::string_view{ vertex_glsl }, std::string_view{ frag_glsl });
 
         m_UnitQuadVBO = OpenGL::CreateBuffer(OpenGL::BufferType::Vertices, std::as_bytes(std::span{ g_UnitQuadVertices }));
-
         m_InstanceVBO = OpenGL::CreateBuffer(OpenGL::BufferType::Vertices, MAX_INSTANCES_PER_BATCH * sizeof(InstanceData));
-
-        m_EBO = OpenGL::CreateBuffer(OpenGL::BufferType::Indices, std::as_bytes(std::span{ g_QuadIndices }));
+        m_EBO         = OpenGL::CreateBuffer(OpenGL::BufferType::Indices, std::as_bytes(std::span{ g_QuadIndices }));
 
         OpenGL::VertexBuffer unitQuadLayout{
             m_UnitQuadVBO, { OpenGL::Attribute::Float2, OpenGL::Attribute::Float2 }
@@ -70,14 +95,12 @@ namespace CS200
 
         m_VAO = OpenGL::CreateVertexArrayObject({ unitQuadLayout, instanceLayout }, m_EBO);
 
-        std::array<int, MAX_TEXTURE_SLOTS> samplers{};
-        for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; ++i)
-        {
-            samplers[i] = static_cast<int>(i);
-        }
+        // --- 6. 텍스처 샘플러 바인딩 (ysw 방식) ---
+        std::vector<int> samplers(m_TextureSlots.size());
+        std::iota(samplers.begin(), samplers.end(), 0);
 
         GL::UseProgram(m_Shader.Shader);
-        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures[0]"), MAX_TEXTURE_SLOTS, samplers.data());
+        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures[0]"), static_cast<GLsizei>(m_TextureSlots.size()), samplers.data());
         GL::UseProgram(0);
     }
 
@@ -98,7 +121,7 @@ namespace CS200
 
     void InstancedRenderer2D::BeginScene(const Math::TransformationMatrix& view_projection)
     {
-        m_drawCallCount = 0;
+        m_drawCallCount  = 0;
         m_ViewProjection = view_projection;
         StartBatch();
     }
@@ -131,7 +154,7 @@ namespace CS200
 
         GL::DrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_InstanceCount));
         m_drawCallCount++;
-        
+
         GL::BindVertexArray(0);
         GL::UseProgram(0);
     }
@@ -153,7 +176,7 @@ namespace CS200
             }
         }
 
-        if (m_TextureSlotIndex >= MAX_TEXTURE_SLOTS)
+        if (m_TextureSlotIndex >= m_TextureSlots.size())
         {
             Flush();
             StartBatch();
