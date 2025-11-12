@@ -16,11 +16,11 @@
 
 namespace CS200
 {
-    const std::array<Math::vec2, 4> BatchRenderer2D::s_UnitQuadPositions = {
-        Math::vec2{ -0.5f, -0.5f },
-        Math::vec2{  0.5f, -0.5f },
-        Math::vec2{  0.5f,  0.5f },
-        Math::vec2{ -0.5f,  0.5f }
+    const std::array<std::array<float, 2>, 4> BatchRenderer2D::s_UnitQuadPositions = {
+        std::array<float, 2>{ -0.5f, -0.5f },
+         std::array<float, 2>{  0.5f, -0.5f },
+         std::array<float, 2>{  0.5f,  0.5f },
+         std::array<float, 2>{ -0.5f,  0.5f }
     };
 
     BatchRenderer2D::BatchRenderer2D()
@@ -167,18 +167,22 @@ namespace CS200
         const float texID = GetTextureSlot(texture);
         const auto  color = CS200::unpack_color(tintColor);
 
-        const std::array<Math::vec2, 4> texCoords = {
-            texture_coord_bl, Math::vec2{ texture_coord_tr.x, texture_coord_bl.y },
-             texture_coord_tr, Math::vec2{ texture_coord_bl.x, texture_coord_tr.y }
+        const std::array<std::array<float, 2>, 4> texCoords = {
+            { { static_cast<float>(texture_coord_bl.x), static_cast<float>(texture_coord_bl.y) },
+             { static_cast<float>(texture_coord_tr.x), static_cast<float>(texture_coord_bl.y) },
+             { static_cast<float>(texture_coord_tr.x), static_cast<float>(texture_coord_tr.y) },
+             { static_cast<float>(texture_coord_bl.x), static_cast<float>(texture_coord_tr.y) } }
         };
 
         for (size_t i = 0; i < 4; ++i)
         {
             QuadVertex vertex;
-            vertex.Position  = transform * s_UnitQuadPositions[i];
-            vertex.TintColor = color;
-            vertex.TexCoord  = texCoords[i];
-            vertex.TexID     = texID;
+            Math::vec2 local_pos = { s_UnitQuadPositions[i][0], s_UnitQuadPositions[i][1] };
+            Math::vec2 world_pos = transform * local_pos;
+            vertex.Position      = { static_cast<float>(world_pos.x), static_cast<float>(world_pos.y) };
+            vertex.TintColor     = color;
+            vertex.TexCoord      = texCoords[i];
+            vertex.TexID         = texID;
             m_Vertices.push_back(vertex);
         }
 

@@ -29,21 +29,21 @@ public:
 private:
     struct Sprite
     {
-        Math::vec2 position;
-        Math::vec2 velocity;
-        double     rotation = 0.0;
+        Math::vec2  position;
+        Math::vec2  velocity;
+        double      rotation = 0.0;
         CS200::RGBA tint;
     };
 
     CS200::BatchRenderer2D m_Renderer;
-    
+
     std::shared_ptr<CS230::Texture> m_TextureCat;
     std::shared_ptr<CS230::Texture> m_TextureRobot;
 
     std::vector<Sprite> m_Sprites;
 
-    int m_SpriteCount = 100;
-    bool m_Animate = true;
+    int  m_SpriteCount = 15000;
+    bool m_Animate     = true;
 
     mutable Math::ivec2 m_ScreenSize;
 };

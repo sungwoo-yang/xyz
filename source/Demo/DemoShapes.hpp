@@ -14,7 +14,6 @@
 #include "Engine/Vec2.hpp"
 #include <array>
 #include <gsl/gsl>
-#include <optional>
 
 class DemoShapes : public CS230::GameState
 {
@@ -72,8 +71,6 @@ private:
     // Animation and interaction
     bool animateRotation = false;
     bool animateScale    = false;
-
-    std::optional<std::string> m_nextState;
 
 private:
     void                       updateInput();

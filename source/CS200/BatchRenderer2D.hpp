@@ -45,9 +45,9 @@ namespace CS200
 
         struct QuadVertex
         {
-            Math::vec2           Position;
+            std::array<float, 2> Position;
             std::array<float, 4> TintColor;
-            Math::vec2           TexCoord;
+            std::array<float, 2> TexCoord;
             float                TexID;
         };
 
@@ -69,6 +69,6 @@ namespace CS200
 
         Math::TransformationMatrix m_ViewProjection{};
 
-        static const std::array<Math::vec2, 4> s_UnitQuadPositions;
+        static const std::array<std::array<float, 2>, 4> s_UnitQuadPositions;
     };
 }
