@@ -54,13 +54,13 @@ namespace CS200
         GL::GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
         m_TextureSlots.resize(static_cast<size_t>(std::min(max_tex_units, 32)));
 
-        const std::filesystem::path vertex_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/instanced.vert");
+        const std::filesystem::path vertex_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/Instanced.vert");
         std::ifstream               vert_stream(vertex_file);
         std::stringstream           vert_text_stream;
         vert_text_stream << vert_stream.rdbuf();
         const std::string vertex_glsl = vert_text_stream.str();
 
-        const std::filesystem::path fragment_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/instanced.frag");
+        const std::filesystem::path fragment_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/Instanced.frag");
         std::ifstream               frag_stream(fragment_file);
         std::stringstream           frag_text_stream;
         frag_text_stream << frag_stream.rdbuf();
@@ -85,12 +85,11 @@ namespace CS200
 
         auto inst_float3 = OpenGL::Attribute::Float3;
         auto inst_float4 = OpenGL::Attribute::Float4;
-        auto inst_float  = OpenGL::Attribute::Float;
+        auto inst_float2 = OpenGL::Attribute::Float2;
+        auto inst_int    = OpenGL::Attribute::Int;
 
         OpenGL::VertexBuffer instanceLayout{
-            m_InstanceVBO,
-            { inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float3.WithDivisor(1),
-              inst_float4.WithDivisor(1), inst_float.WithDivisor(1) }
+            m_InstanceVBO, { inst_float3.WithDivisor(1), inst_float3.WithDivisor(1), inst_float4.WithDivisor(1), inst_float2.WithDivisor(1), inst_float2.WithDivisor(1), inst_int.WithDivisor(1) }
         };
 
         m_VAO = OpenGL::CreateVertexArrayObject({ unitQuadLayout, instanceLayout }, m_EBO);
@@ -165,13 +164,13 @@ namespace CS200
         m_TextureSlotIndex = 0;
     }
 
-    float InstancedRenderer2D::GetTextureSlot(OpenGL::TextureHandle texture)
+    int InstancedRenderer2D::GetTextureSlot(OpenGL::TextureHandle texture)
     {
         for (uint32_t i = 0; i < m_TextureSlotIndex; ++i)
         {
             if (m_TextureSlots[i] == texture)
             {
-                return static_cast<float>(i);
+                return static_cast<int>(i);
             }
         }
 
@@ -182,7 +181,7 @@ namespace CS200
         }
 
         m_TextureSlots[m_TextureSlotIndex] = texture;
-        return static_cast<float>(m_TextureSlotIndex++);
+        return static_cast<int>(m_TextureSlotIndex++);
     }
 
     void InstancedRenderer2D::DrawQuad(const Math::TransformationMatrix& transform, OpenGL::TextureHandle texture, Math::vec2 texture_coord_bl, Math::vec2 texture_coord_tr, CS200::RGBA tintColor)
@@ -195,14 +194,11 @@ namespace CS200
 
         InstanceData data;
 
-        data.ModelMatrix = Renderer2DUtils::to_opengl_mat3(transform);
+        data.ModelRow0 = { static_cast<float>(transform[0][0]), static_cast<float>(transform[0][1]), static_cast<float>(transform[0][2]) };
+        data.ModelRow1 = { static_cast<float>(transform[1][0]), static_cast<float>(transform[1][1]), static_cast<float>(transform[1][2]) };
 
-        Math::TransformationMatrix uv_transform;
-        uv_transform[0][0] = texture_coord_tr.x - texture_coord_bl.x;
-        uv_transform[1][1] = texture_coord_tr.y - texture_coord_bl.y;
-        uv_transform[0][2] = texture_coord_bl.x;
-        uv_transform[1][2] = texture_coord_bl.y;
-        data.UVMatrix      = Renderer2DUtils::to_opengl_mat3(uv_transform);
+        data.TexCoordScale  = { static_cast<float>(texture_coord_tr.x - texture_coord_bl.x), static_cast<float>(texture_coord_tr.y - texture_coord_bl.y) };
+        data.TexCoordOffset = { static_cast<float>(texture_coord_bl.x), static_cast<float>(texture_coord_bl.y) };
 
         data.TintColor = CS200::unpack_color(tintColor);
         data.TexID     = GetTextureSlot(texture);

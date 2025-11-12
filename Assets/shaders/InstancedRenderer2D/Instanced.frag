@@ -17,19 +17,19 @@ precision mediump sampler2D;
 uniform sampler2D u_textures[MAX_TEXTURE_SLOTS];
 
 in vec2 v_uv;
-in vec4 v_color;
-flat in float v_tex_id;
+flat in vec4 v_color;
+flat in int v_tex_id;
 
 layout(location = 0) out vec4 frag_color;
 
 void main()
 {
-    int tex_index = int(v_tex_id + 0.5);
+    int tex_index = v_tex_id;
     vec4 tex_color;
 
     switch(tex_index)
     {
-         case 0: tex_color = texture(u_textures[0], v_uv); break;
+        case 0: tex_color = texture(u_textures[0], v_uv); break;
 
         case 1: tex_color = texture(u_textures[1], v_uv); break;
 

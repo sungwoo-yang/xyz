@@ -40,8 +40,8 @@ private:
     std::shared_ptr<CS230::Texture> m_tex_white_pixel;
 
     std::vector<Star> m_stars;
-    
-    double m_bg_offset_planets   = 0.0;
+
+    double         m_bg_offset_planets   = 0.0;
     mutable double m_fg_offset_platforms = 0.0;
 
     mutable Math::ivec2 m_screen_size;

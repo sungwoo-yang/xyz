@@ -203,7 +203,7 @@ namespace CS200
         for (size_t i = 0; i < 4; ++i)
         {
             QuadVertex vertex;
-            Math::vec2 local_pos = { s_UnitQuadPositions[i][0], s_UnitQuadPositions[i][1] };
+            Math::vec2 local_pos = { static_cast<double>(s_UnitQuadPositions[i][0]), static_cast<double>(s_UnitQuadPositions[i][1]) };
             Math::vec2 world_pos = transform * local_pos;
             vertex.Position      = { static_cast<float>(world_pos.x), static_cast<float>(world_pos.y) };
             vertex.TintColor     = color;
