@@ -49,10 +49,10 @@ namespace CS200
     }
 
     void InstancedRenderer2D::Init()
-    { 
+    {
         GLint max_tex_units = 0;
         GL::GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
-        m_TextureSlots.resize(std::min(max_tex_units, 32));
+        m_TextureSlots.resize(static_cast<size_t>(std::min(max_tex_units, 32)));
 
         const std::filesystem::path vertex_file = assets::locate_asset("Assets/shaders/InstancedRenderer2D/instanced.vert");
         std::ifstream               vert_stream(vertex_file);
@@ -95,7 +95,6 @@ namespace CS200
 
         m_VAO = OpenGL::CreateVertexArrayObject({ unitQuadLayout, instanceLayout }, m_EBO);
 
-        // --- 6. 텍스처 샘플러 바인딩 (ysw 방식) ---
         std::vector<int> samplers(m_TextureSlots.size());
         std::iota(samplers.begin(), samplers.end(), 0);
 
@@ -163,12 +162,12 @@ namespace CS200
     {
         m_InstanceData.clear();
         m_InstanceCount    = 0;
-        m_TextureSlotIndex = 1;
+        m_TextureSlotIndex = 0;
     }
 
     float InstancedRenderer2D::GetTextureSlot(OpenGL::TextureHandle texture)
     {
-        for (uint32_t i = 1; i < m_TextureSlotIndex; ++i)
+        for (uint32_t i = 0; i < m_TextureSlotIndex; ++i)
         {
             if (m_TextureSlots[i] == texture)
             {

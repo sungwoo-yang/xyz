@@ -63,6 +63,10 @@ namespace CS200
 
         quadShader = OpenGL::CreateShader(std::filesystem::path{ "Assets/shaders/ImmediateRenderer2D/quad.vert" }, std::filesystem::path{ "Assets/shaders/ImmediateRenderer2D/quad.frag" });
 
+        GL::UseProgram(quadShader.Shader);
+        GL::Uniform1i(quadShader.UniformLocations.at("u_texture"), 0);
+        GL::UseProgram(0);
+
         struct SDFVertex
         {
             float x, y;
@@ -122,6 +126,7 @@ namespace CS200
     {
         GL::UseProgram(quadShader.Shader);
         GL::BindVertexArray(quad.vertexArray);
+        GL::ActiveTexture(GL_TEXTURE0);
         GL::BindTexture(GL_TEXTURE_2D, texture);
 
         const auto& locations    = quadShader.UniformLocations;
@@ -141,7 +146,7 @@ namespace CS200
 
         GL::DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
         m_drawCallCount++;
-        
+
         GL::BindTexture(GL_TEXTURE_2D, 0);
         GL::BindVertexArray(0);
         GL::UseProgram(0);

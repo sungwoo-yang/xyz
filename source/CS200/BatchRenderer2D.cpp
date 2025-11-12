@@ -13,8 +13,8 @@
 #include "OpenGL/Buffer.hpp"
 #include "OpenGL/GL.hpp"
 #include "Renderer2DUtils.hpp"
-#include < numeric>
 #include <fstream>
+#include <numeric>
 #include <sstream>
 #include <utility>
 
@@ -44,7 +44,7 @@ namespace CS200
     {
         GLint max_tex_units = 0;
         GL::GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_tex_units);
-        m_TextureSlots.resize(std::min(max_tex_units, 32));
+        m_TextureSlots.resize(static_cast<size_t>(std::min(max_tex_units, 32)));
 
         const std::filesystem::path vertex_file = assets::locate_asset("Assets/shaders/BatchRenderer2D/batch.vert");
         std::ifstream               vert_stream(vertex_file);
@@ -158,12 +158,12 @@ namespace CS200
     {
         m_Vertices.clear();
         m_IndexCount       = 0;
-        m_TextureSlotIndex = 1;
+        m_TextureSlotIndex = 0;
     }
 
     float BatchRenderer2D::GetTextureSlot(OpenGL::TextureHandle texture)
     {
-        for (uint32_t i = 1; i < m_TextureSlotIndex; ++i)
+        for (uint32_t i = 0; i < m_TextureSlotIndex; ++i)
         {
             if (m_TextureSlots[i] == texture)
             {
