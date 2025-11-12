@@ -13,6 +13,7 @@
 #include "CS200/RGBA.hpp"
 #include "CS200/RenderingAPI.hpp"
 #include "DemoBatchRendering.hpp"
+#include "DemoCreativeScene.hpp"
 #include "DemoInstancedRendering.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
@@ -26,7 +27,6 @@
 #include <numbers>
 #include <sstream>
 
-// Arithmetic operators for std::array<float, 4> to support color easing
 namespace
 {
     std::array<float, 4> operator-(const std::array<float, 4>& a, const std::array<float, 4>& b)
@@ -214,6 +214,11 @@ void DemoShapes::DrawImGui()
         {
             Engine::GetGameStateManager().PopState();
             Engine::GetGameStateManager().PushState<DemoInstancedRendering>();
+        }
+        if (ImGui::Button("Switch to Creative Scene (Demo 2)"))
+        {
+            Engine::GetGameStateManager().PopState();
+            Engine::GetGameStateManager().PushState<DemoCreativeScene>();
         }
     }
     ImGui::End();

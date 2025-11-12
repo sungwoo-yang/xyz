@@ -10,6 +10,7 @@
 #include "CS200/NDC.hpp"
 #include "CS200/RenderingAPI.hpp"
 #include "DemoBatchRendering.hpp"
+#include "DemoCreativeScene.hpp"
 #include "DemoShapes.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
@@ -242,6 +243,11 @@ void DemoInstancedRendering::DrawImGui()
         {
             Engine::GetGameStateManager().PopState();
             Engine::GetGameStateManager().PushState<DemoBatchRendering>();
+        }
+        if (ImGui::Button("Switch to Creative Scene (Demo 2)"))
+        {
+            Engine::GetGameStateManager().PopState();
+            Engine::GetGameStateManager().PushState<DemoCreativeScene>();
         }
     }
     ImGui::End();

@@ -16,6 +16,7 @@
 #include "Engine/Random.hpp"
 #include "Engine/TextureManager.hpp"
 #include "Engine/Window.hpp"
+#include "DemoCreativeScene.hpp"
 #include <imgui.h>
 
 void DemoBatchRendering::InitializeSprite(Sprite& sprite)
@@ -240,6 +241,11 @@ void DemoBatchRendering::DrawImGui()
         {
             Engine::GetGameStateManager().PopState();
             Engine::GetGameStateManager().PushState<DemoInstancedRendering>();
+        }
+        if (ImGui::Button("Switch to Creative Scene (Demo 2)"))
+        {
+            Engine::GetGameStateManager().PopState();
+            Engine::GetGameStateManager().PushState<DemoCreativeScene>();
         }
     }
     ImGui::End();

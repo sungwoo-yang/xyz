@@ -21,6 +21,7 @@ set(SOURCE_CODE
     Demo/DemoShapes.hpp Demo/DemoShapes.cpp
     Demo/DemoBatchRendering.hpp Demo/DemoBatchRendering.cpp
     Demo/DemoInstancedRendering.hpp Demo/DemoInstancedRendering.cpp
+    Demo/DemoCreativeScene.hpp Demo/DemoCreativeScene.cpp
 
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp
