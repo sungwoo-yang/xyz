@@ -71,13 +71,13 @@ namespace CS200
         m_VAO = OpenGL::CreateVertexArrayObject({ unitQuadLayout, instanceLayout }, m_EBO);
 
         std::array<int, MAX_TEXTURE_SLOTS> samplers{};
-        for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i)
+        for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; ++i)
         {
-            samplers[i] = i;
+            samplers[i] = static_cast<int>(i);
         }
 
         GL::UseProgram(m_Shader.Shader);
-        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures"), MAX_TEXTURE_SLOTS, samplers.data());
+        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures[0]"), MAX_TEXTURE_SLOTS, samplers.data());
         GL::UseProgram(0);
     }
 

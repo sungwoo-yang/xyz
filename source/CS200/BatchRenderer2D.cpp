@@ -67,13 +67,13 @@ namespace CS200
         m_TextureSlots[0] = 0;
 
         std::array<int, MAX_TEXTURE_SLOTS> samplers{};
-        for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i)
+        for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; ++i)
         {
-            samplers[i] = i;
+            samplers[i] = static_cast<int>(i);
         }
 
         GL::UseProgram(m_Shader.Shader);
-        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures"), MAX_TEXTURE_SLOTS, samplers.data());
+        GL::Uniform1iv(m_Shader.UniformLocations.at("u_textures[0]"), MAX_TEXTURE_SLOTS, samplers.data());
         GL::UseProgram(0);
     }
 
@@ -188,12 +188,15 @@ namespace CS200
     void BatchRenderer2D::DrawCircle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
+
     void BatchRenderer2D::DrawRectangle(const Math::TransformationMatrix&, CS200::RGBA, CS200::RGBA, double)
     {
     }
+
     void BatchRenderer2D::DrawLine(const Math::TransformationMatrix&, Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }
+
     void BatchRenderer2D::DrawLine(Math::vec2, Math::vec2, CS200::RGBA, double)
     {
     }

@@ -41,7 +41,7 @@ private:
 
     std::vector<Sprite> m_Sprites;
 
-    int m_SpriteCount = 10000;
+    int m_SpriteCount = 100;
     bool m_Animate = true;
 
     mutable Math::ivec2 m_ScreenSize;

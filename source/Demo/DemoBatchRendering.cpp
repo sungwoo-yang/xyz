@@ -28,14 +28,14 @@ void DemoBatchRendering::Load()
 
     m_ScreenSize = Engine::GetWindow().GetSize();
 
-    m_Sprites.resize(m_SpriteCount);
+    m_Sprites.resize(static_cast<size_t>(m_SpriteCount));
     for (int i = 0; i < m_SpriteCount; ++i)
     {
-        auto& sprite    = m_Sprites[i];
+        auto& sprite    = m_Sprites[static_cast<size_t>(i)];
         sprite.position = { util::random(0.0, static_cast<double>(m_ScreenSize.x)), util::random(0.0, static_cast<double>(m_ScreenSize.y)) };
         sprite.velocity = { util::random(-100.0, 100.0), util::random(-100.0, 100.0) };
         sprite.rotation = util::random(0.0, 3.14159 * 2.0);
-        sprite.tint     = CS200::pack_color({ (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), (float)util::random(0.5, 1.0), 1.0f });
+        sprite.tint     = CS200::pack_color({ static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), static_cast<float>(util::random(0.5, 1.0)), 1.0f });
     }
 }
 
@@ -81,24 +81,22 @@ void DemoBatchRendering::Draw() const
 
     const Math::ivec2 catFrameSize   = { 128, 128 };
     const Math::ivec2 robotFrameSize = { 63, 127 };
-    const Math::ivec2 catTexelPos    = { 0, 0 };
-    const Math::ivec2 robotTexelPos  = { 0, 0 };
 
     for (int i = 0; i < m_SpriteCount; ++i)
     {
-        const auto& sprite = m_Sprites[i];
+        const auto& sprite = m_Sprites[ static_cast<size_t>(i)];
 
         if (i % 2 == 0)
         {
             Math::TransformationMatrix transform =
-                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({ (double)catFrameSize.x, (double)catFrameSize.y });
+                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({  static_cast<double>(catFrameSize.x), static_cast<double>(catFrameSize.y) });
 
             renderer.DrawQuad(transform, m_TextureCat->GetHandle(), { 0.0, 0.0 }, { 128.0 / 640.0, 128.0 / 256.0 }, sprite.tint);
         }
         else
         {
             Math::TransformationMatrix transform =
-                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({ (double)robotFrameSize.x, (double)robotFrameSize.y });
+                Math::TranslationMatrix(sprite.position) * Math::RotationMatrix(sprite.rotation) * Math::ScaleMatrix({ static_cast<double>(robotFrameSize.x), static_cast<double>(robotFrameSize.y) });
 
             renderer.DrawQuad(transform, m_TextureRobot->GetHandle(), { 0.0, 0.0 }, { 63.0 / 315.0, 1.0 }, sprite.tint);
         }
