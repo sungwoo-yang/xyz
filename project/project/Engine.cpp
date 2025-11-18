@@ -29,6 +29,9 @@ void Engine::Update() {
       if (event.type == sf::Event::Closed) {
         Shutdown();
       }
+      else if (event.type == sf::Event::Resized) {
+        mWindow.Resize(event.size.width, event.size.height);
+      }
     }
 
     mWindow.Update();

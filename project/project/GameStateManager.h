@@ -6,6 +6,7 @@
 class GameStateManager {
  public:
   GameStateManager();
+  ~GameStateManager();
 
   void AddGameState(GameState* gameState);
   void Update(double dt);

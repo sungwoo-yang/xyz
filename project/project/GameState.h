@@ -3,6 +3,7 @@
 
 class GameState {
  public:
+  virtual ~GameState() {};
   virtual void Load() = 0;
   virtual void Update(double dt) = 0;
   virtual void Unload() = 0;

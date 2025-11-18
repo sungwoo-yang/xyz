@@ -11,6 +11,13 @@ void GameStateManager::AddGameState(GameState* gameState) {
   mGameStates.push_back(gameState);
 }
 
+GameStateManager::~GameStateManager() {
+  for (GameState* gamestate : mGameStates) {
+    delete gamestate;
+  }
+  mGameStates.clear();
+}
+
 void GameStateManager::Update(double dt) {
   switch (mState) {
     case GameStateManager::State::START:
