@@ -14,7 +14,6 @@ void MainMenu::Load() {
 
   mMainMenuText.setFont(mFont);
   mMainMenuText.setString("Main Menu!\nPress Space");
-  // mMainMenuText.setPosition(sf::Vector2f(0, 0));
   mMainMenuText.setCharacterSize(120);
   mMainMenuText.setStyle(sf::Text::Regular);
 
