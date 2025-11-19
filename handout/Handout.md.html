@@ -1,0 +1,86 @@
+<meta charset="utf-8">
+
+# CS180 Image Convolution - Threads Assignment
+
+## Information
+For this assignment you will be optimizing an image processing program.
+This Image Convolution program, given one or more PNG files, will generate seven new versions, where each applies a different effect.
+
+![Identity](images/conv_bell.Identity.png)![Blur](images/conv_bell.Blur.png)![Sharpen](images/conv_bell.Sharpen.png)
+![Emboss](images/conv_bell.Emboss.png)![Lighten](images/conv_bell.Lighten.png)
+![Darken](images/conv_bell.Darken.png)![EdgeDetect](images/conv_bell.EdgeDetect.png)
+
+
+## Programming Tasks
+
+Your goal is to optimize the provided program by utilizing threads and processes.
+
+1. Run each specified image in it's own process.
+	- You must make a cross platform interface that is used by your application logic
+	- Then seperate the OS specific system calls into their own cpp files
+
+2. Run each effect on it's own thread. 
+
+3. Split up an effect's calculation over multiple threads
+
+### Non-programming Tasks
+
+For small images, you shouldn't see a big performance gain. In fact, using threads may make it slower.
+
+However, for very large images you should see a performance gain.
+
+In order to get the best efficiency for both small and large images, you should find a threshold. One that decides if an image is small enough then you'll use a single threaded loop otherwise use a divided multi-threaded loop.
+
+1. Describe what you picked for your threshold and how you got it.
+
+2. Describe how you determine how many threads to create.
+	- You may want to checkout [std::thread::hardware_concurrency](https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency)
+
+3. Your executable must be faster or match the original non-threaded version.
+	- Show a report of measurements comparing the original version with yours
+	- How does it compare with the following scenerios?
+		* single small image
+		* single medium image
+		* single large image
+		* multiple small images
+		* multiple medium images
+		* multiple large images
+	- You should include your CPU information that you used to run the tests
+		* on windows: `wmic cpu get caption, deviceid, name, numberofcores, maxclockspeed, status`
+		* on ubuntu: `cat /proc/cpuinfo`
+
+4. The project should support building and running on Windows using VS2017 15.8.2 and Ubuntu using g++ 8.2.
+
+## Timing
+
+You can time the program in bash with the `time` command
+
+* `time ./image_convolution file1.png file2.png`
+	- Real time is defined as time measured from some fixed point (e.g., the start) in the life of a process (elapsed time).
+	- User CPU time is the time spent executing code in user mode. 
+	- System CPU time is the time spent by the kernel executing in system mode on behalf of the process (e.g., executing system calls).
+
+Powershell has it's own command for timing as well
+
+* `Measure-Command {start-process image_convolution.exe -argumentlist "file1.png file2.png" -Wait}`
+
+## What to submit
+
+Submit all the code and project files needed to build and run on Windows and Ubuntu.
+
+Do not submit auto generated files and do not submit images.
+
+## Recommendations
+
+Try using **`std::async()`** first.
+
+Try using **`std::packaged_task`** second.
+
+Use **`std::thread`** and **`std::mutex`** last.
+
+## References
+This assignment was based off of this tutorial on [Convolution Image Processing](http://beej.us/blog/data/convolution-image-processing/).<br/>
+The PNG reading/writing logic is from [lodepng](https://github.com/lvandeve/lodepng).
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
