@@ -13,25 +13,38 @@
 #include "ConvolutePNG.hpp"
 #include "ColorGrid.hpp"
 #include "ConvolutionType.hpp"
+#include <thread>
+#include <vector>
+#include <algorithm>
+#include <iostream>
 
 namespace
 {
-    CS180::ColorGrid convolute(const CS180::ColorGrid& source_grid, const CS180::ConvolutionMatrix convolution);
+    CS180::ColorGrid convolute(const CS180::ColorGrid &source_grid, const CS180::ConvolutionMatrix convolution);
 }
 
 namespace CS180
 {
-    void generate_convolutions_and_their_png_files(const std::filesystem::path& source_png_file, const std::filesystem::path& destination_folder)
+    void generate_convolutions_and_their_png_files(const std::filesystem::path &source_png_file, const std::filesystem::path &destination_folder)
     {
-        //TODO: for each convolution type generate a new image in it's own thread
         using namespace std::string_literals;
         const ColorGrid source_grid = load_color_grid_from_png_file_path(source_png_file.generic_string());
+        std::vector<std::thread> threads;
+
         for (auto type = ConvolutionType::Identity; type < ConvolutionType::Length; ++type)
         {
-            const auto colors_result = convolute(source_grid, CONVOLUTIONS[type]);
-            auto destination_png = destination_folder / source_png_file.filename();
-            destination_png.replace_extension("."s + CONVOLUTION_NAMES[type] + ".png"s);
-            save_color_grid_to_png_file(colors_result, destination_png.generic_string());
+            threads.emplace_back([&source_grid, source_png_file, destination_folder, type]()
+                                 {
+                const auto colors_result = convolute(source_grid, CONVOLUTIONS[type]);
+                auto destination_png = destination_folder / source_png_file.filename();
+                destination_png.replace_extension("."s + CONVOLUTION_NAMES[type] + ".png"s);
+                save_color_grid_to_png_file(colors_result, destination_png.generic_string()); });
+        }
+
+        for (auto &t : threads)
+        {
+            if (t.joinable())
+                t.join();
         }
     }
 }
@@ -48,7 +61,7 @@ namespace
      * \param convolution type of convolution to perform
      * \return the resulting color from doing the convolution
      */
-    CS180::Color3D calculate_pixel(const CS180::ColorGrid& grid, unsigned color_row, unsigned color_column,
+    CS180::Color3D calculate_pixel(const CS180::ColorGrid &grid, unsigned color_row, unsigned color_column,
                                    const CS180::ConvolutionMatrix convolution)
     {
         CS180::Color3D sum{0, 0, 0};
@@ -68,30 +81,50 @@ namespace
         return sum;
     }
 
-    CS180::ColorGrid convolute(const CS180::ColorGrid& source_grid, const CS180::ConvolutionMatrix convolution)
+    CS180::ColorGrid convolute(const CS180::ColorGrid &source_grid, const CS180::ConvolutionMatrix convolution)
     {
-        //TODO: generate destination over multiple threads
         CS180::ColorGrid destination(source_grid.width, source_grid.height);
 
         auto source_colors_starting_address = &source_grid.colors[0];
-        std::for_each(std::cbegin(source_grid.colors), std::cend(source_grid.colors), [&](const CS180::Color3D& source_color) {
-            // It may seem odd that we are calculating the (row,column).
-            // I'm doing this so that it is easy to split up the calculation over multiple threads. It is simpler to split
-            // up a range of 1 dimensional values than 2 dimensional values.
-            const auto index_location = &source_color - source_colors_starting_address;
-            const auto row = unsigned(index_location / source_grid.width);
-            const auto column = unsigned(index_location % source_grid.width);
-            if (column != 0 && column < source_grid.width - 1 && row != 0 && row < source_grid.height - 1)
-            {
-                const auto new_color = calculate_pixel(source_grid, row, column, convolution);
-                destination(row, column) = new_color;
-            }
-            else
-            {
-                // simply copy the colors located on the borders
-                destination(row, column) = source_grid(row, column);
-            }
-        });
+
+        unsigned num_threads = std::thread::hardware_concurrency();
+        if (num_threads == 0)
+            num_threads = 4;
+
+        size_t total_pixels = source_grid.colors.size();
+        size_t chunk_size = total_pixels / num_threads;
+
+        std::vector<std::thread> workers;
+        workers.reserve(num_threads);
+
+        for (unsigned i = 0; i < num_threads; ++i)
+        {
+            auto start_it = source_grid.colors.cbegin() + (i * chunk_size);
+            auto end_it = (i == num_threads - 1) ? source_grid.colors.cend() : start_it + chunk_size;
+
+            workers.emplace_back([start_it, end_it, &source_grid, &destination, convolution, source_colors_starting_address]()
+                                 { std::for_each(start_it, end_it, [&](const CS180::Color3D &source_color)
+                                                 {
+                    const auto index_location = &source_color - source_colors_starting_address;
+                    const auto row = unsigned(index_location / source_grid.width);
+                    const auto column = unsigned(index_location % source_grid.width);
+                    
+                    if (column != 0 && column < source_grid.width - 1 && row != 0 && row < source_grid.height - 1)
+                    {
+                        const auto new_color = calculate_pixel(source_grid, row, column, convolution);
+                        destination(row, column) = new_color;
+                    }
+                    else
+                    {
+                        destination(row, column) = source_grid(row, column);
+                    } }); });
+        }
+
+        for (auto &worker : workers)
+        {
+            if (worker.joinable())
+                worker.join();
+        }
 
         return destination;
     }

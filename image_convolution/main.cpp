@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
+#include <thread>
 #include "ConvolutePNG.hpp"
 
 namespace
@@ -23,20 +24,28 @@ namespace
         std::vector<std::filesystem::path> pngPaths{};
         std::filesystem::path destinationPath;
     };
-    InputParameters extract_input_from_command_line(int argc, char* argv[]);
+    InputParameters extract_input_from_command_line(int argc, char *argv[]);
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     // https://en.cppreference.com/w/cpp/language/structured_binding
     auto [status_code, png_paths, destination_path] = extract_input_from_command_line(argc, argv);
     if (status_code != 0)
         return status_code;
 
-    //TODO: for each png run in it's own process
-    for (const auto& path : png_paths )
+    std::vector<std::thread> threads;
+    threads.reserve(png_paths.size());
+
+    for (const auto &path : png_paths)
     {
-        CS180::generate_convolutions_and_their_png_files(path, destination_path);
+        threads.emplace_back(CS180::generate_convolutions_and_their_png_files, path, destination_path);
+    }
+
+    for (auto &t : threads)
+    {
+        if (t.joinable())
+            t.join();
     }
 
     return 0;
@@ -44,9 +53,9 @@ int main(int argc, char* argv[])
 
 namespace
 {
-    void print_usage(char* argv[]) { std::cerr << "usage: " << argv[0] << " file_1.png file_2.png file_n.png [destination_folder]\n"; }
+    void print_usage(char *argv[]) { std::cerr << "usage: " << argv[0] << " file_1.png file_2.png file_n.png [destination_folder]\n"; }
 
-    InputParameters extract_input_from_command_line(int argc, char* argv[])
+    InputParameters extract_input_from_command_line(int argc, char *argv[])
     {
         InputParameters input_values;
         input_values.destinationPath = std::filesystem::current_path();
