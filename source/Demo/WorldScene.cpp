@@ -86,15 +86,18 @@ void WorldScene::Update()
         CS200::Camera& cam    = m_cameras[static_cast<size_t>(i)];
         const Player&  player = m_players[static_cast<size_t>(i)];
 
-        cam.position = player.position;
+        double lerpFactor = 5.0 * dt;
+        cam.position.x += (player.position.x - cam.position.x) * lerpFactor;
+        cam.position.y += (player.position.y - cam.position.y) * lerpFactor;
 
         if (cam.mode == CS200::CameraMode::FirstPerson_View)
         {
-            cam.rotation = player.rotation;
+            double diff = player.rotation - cam.rotation;
+            cam.rotation += diff * lerpFactor;
         }
         else
         {
-            cam.rotation = 0.0;
+            cam.rotation += (0.0 - cam.rotation) * lerpFactor;
         }
     }
 }
@@ -224,12 +227,71 @@ void WorldScene::DrawWorld(const Math::TransformationMatrix& viewProj) const
     auto& immRenderer = const_cast<CS200::ImmediateRenderer2D&>(m_immediateRenderer);
     immRenderer.BeginScene(viewProj);
 
-    DrawGrid(immRenderer);
+    static std::vector<Math::vec2> stars;
+    if (stars.empty())
+    {
+        for (int i = 0; i < 200; ++i)
+        {
+            stars.push_back({ util::random(-2000.0, 2000.0), util::random(-2000.0, 2000.0) });
+        }
+    }
 
+#ifndef GL_POINT_SIZE
+#    define GL_POINT_SIZE 0x0B11
+#endif
+    GL::PointSize(3.0f);
+    immRenderer.DrawVertices(CS200::PrimitiveType::Points, stars, 0xFFFFFF88);
+
+    std::vector<Math::vec2> lines;
+    lines.push_back({ -2000.0, 0.0 });
+    lines.push_back({ 2000.0, 0.0 });
+    lines.push_back({ 0.0, -2000.0 });
+    lines.push_back({ 0.0, 2000.0 });
+    GL::LineWidth(2.0f);
+    immRenderer.DrawVertices(CS200::PrimitiveType::Lines, lines, 0xFFFFFF44);
+
+    static std::vector<Math::vec2> trail;
+    static double                  timeAccum = 0.0;
+    timeAccum += Engine::GetWindowEnvironment().DeltaTime;
+    if (timeAccum > 0.1)
+    {
+        trail.push_back(m_players[0].position);
+        if (trail.size() > 50)
+            trail.erase(trail.begin());
+        timeAccum = 0.0;
+    }
+    if (trail.size() > 1)
+    {
+        GL::LineWidth(2.0f);
+        immRenderer.DrawVertices(CS200::PrimitiveType::LineStrip, trail, 0xFF0000AA);
+    }
+
+    std::vector<Math::vec2> safeZone = {
+        { -300, -300 },
+        {  300, -300 },
+        {  300,  300 },
+        { -300,  300 }
+    };
+    immRenderer.DrawVertices(CS200::PrimitiveType::LineLoop, safeZone, 0x00FF00AA);
+
+    std::vector<Math::vec2> fan;
+    fan.push_back({ 0, 0 });
+    for (int i = 0; i <= 16; ++i)
+    {
+        double rad = i * (3.141592 * 2.0 / 16.0);
+        fan.push_back({ std::cos(rad) * 100.0, std::sin(rad) * 100.0 });
+    }
+    immRenderer.DrawVertices(CS200::PrimitiveType::TriangleFan, fan, Math::TranslationMatrix(Math::vec2{ 500.0, 500.0 }), CS200::RGBA(0x0000FF55));
+    std::vector<Math::vec2> strip;
+    for (int i = 0; i < 10; ++i)
+    {
+        strip.push_back({ static_cast<double>(i) * 50.0, 0.0 });
+        strip.push_back({ static_cast<double>(i) * 50.0, 40.0 });
+    }
+    immRenderer.DrawVertices(CS200::PrimitiveType::TriangleStrip, strip, Math::TranslationMatrix(Math::vec2{ -500.0, -500.0 }), 0xFFFF0055);
     for (const auto& obj : m_worldObjects)
     {
         Math::TransformationMatrix transform = Math::TranslationMatrix(obj.position) * Math::RotationMatrix(obj.rotation) * Math::ScaleMatrix(obj.scale);
-
         if (obj.isCircle)
             immRenderer.DrawCircle(transform, obj.color, CS200::WHITE, 2.0);
         else

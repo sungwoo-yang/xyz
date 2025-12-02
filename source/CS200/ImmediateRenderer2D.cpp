@@ -13,13 +13,14 @@
 #include "OpenGL/Buffer.hpp"
 #include "OpenGL/GL.hpp"
 #include "Renderer2DUtils.hpp"
+#include <algorithm>
 #include <utility>
 
 namespace CS200
 {
     ImmediateRenderer2D::ImmediateRenderer2D(ImmediateRenderer2D&& other) noexcept
         : quad(std::exchange(other.quad, {})), quadShader(std::exchange(other.quadShader, {})), sdfQuad(std::exchange(other.sdfQuad, {})), sdfShader(std::exchange(other.sdfShader, {})),
-          view_projection(std::exchange(other.view_projection, {}))
+          view_projection(std::exchange(other.view_projection, {})), primitives(std::exchange(other.primitives, {}))
     {
     }
 
@@ -30,6 +31,7 @@ namespace CS200
         std::swap(sdfQuad, other.sdfQuad);
         std::swap(sdfShader, other.sdfShader);
         std::swap(view_projection, other.view_projection);
+        std::swap(primitives, other.primitives);
         return *this;
     }
 
@@ -87,6 +89,16 @@ namespace CS200
         sdfQuad.vertexArray = OpenGL::CreateVertexArrayObject(sdf_layout, sdfQuad.indexBuffer);
 
         sdfShader = OpenGL::CreateShader(std::filesystem::path{ "Assets/shaders/ImmediateRenderer2D/sdf.vert" }, std::filesystem::path{ "Assets/shaders/ImmediateRenderer2D/sdf.frag" });
+
+        constexpr CS200::RGBA whitePixel = 0xFFFFFFFF;
+        primitives.whiteTexture          = OpenGL::CreateTextureFromMemory({ 1, 1 }, std::span{ &whitePixel, 1 });
+
+        primitives.vertexBuffer = OpenGL::CreateBuffer(OpenGL::BufferType::Vertices, static_cast<GLsizeiptr>(MAX_VERTICES * sizeof(Math::vec2)));
+
+        const auto primitive_layout = {
+            OpenGL::VertexBuffer{ primitives.vertexBuffer, { OpenGL::Attribute::Float2 } }
+        };
+        primitives.vertexArray = OpenGL::CreateVertexArrayObject(primitive_layout, 0);
     }
 
     void ImmediateRenderer2D::Shutdown()
@@ -101,6 +113,11 @@ namespace CS200
         GL::DeleteVertexArrays(1, &sdfQuad.vertexArray);
         OpenGL::DestroyShader(sdfShader);
         sdfQuad = {};
+
+        GL::DeleteBuffers(1, &primitives.vertexBuffer);
+        GL::DeleteVertexArrays(1, &primitives.vertexArray);
+        GL::DeleteTextures(1, &primitives.whiteTexture);
+        primitives = {};
     }
 
     void ImmediateRenderer2D::BeginScene(const Math::TransformationMatrix& view_projection_matrix)
@@ -171,6 +188,53 @@ namespace CS200
     void ImmediateRenderer2D::DrawLine(Math::vec2 start_point, Math::vec2 end_point, CS200::RGBA line_color, double line_width)
     {
         DrawLine(Math::TransformationMatrix{}, start_point, end_point, line_color, line_width);
+    }
+
+    void ImmediateRenderer2D::DrawVertices(PrimitiveType mode, const std::vector<Math::vec2>& points, const Math::TransformationMatrix& transform, CS200::RGBA color)
+    {
+        if (points.empty())
+            return;
+
+        GL::UseProgram(quadShader.Shader);
+
+        GL::ActiveTexture(GL_TEXTURE0);
+        GL::BindTexture(GL_TEXTURE_2D, primitives.whiteTexture);
+
+        const auto& locations = quadShader.UniformLocations;
+
+        const auto model_matrix = Renderer2DUtils::to_opengl_mat3(transform);
+        GL::UniformMatrix3fv(locations.at("u_model_matrix"), 1, GL_FALSE, model_matrix.data());
+
+        Math::TransformationMatrix identity;
+        const auto                 uv_matrix = Renderer2DUtils::to_opengl_mat3(identity);
+        GL::UniformMatrix3fv(locations.at("u_uv_matrix"), 1, GL_FALSE, uv_matrix.data());
+
+        const auto color_vec = unpack_color(color);
+        GL::Uniform4fv(locations.at("u_tint_color"), 1, color_vec.data());
+
+        static std::vector<float> tempVertices;
+        size_t                    count = std::min(points.size(), MAX_VERTICES);
+
+        tempVertices.resize(count * 2);
+        for (size_t i = 0; i < count; ++i)
+        {
+            tempVertices[i * 2 + 0] = static_cast<float>(points[i].x);
+            tempVertices[i * 2 + 1] = static_cast<float>(points[i].y);
+        }
+
+        OpenGL::UpdateBufferData(OpenGL::BufferType::Vertices, primitives.vertexBuffer, std::as_bytes(std::span{ tempVertices }));
+
+        GL::BindVertexArray(primitives.vertexArray);
+
+        GL::DisableVertexAttribArray(1);
+        GL::VertexAttrib2f(1, 0.0f, 0.0f);
+
+        GL::DrawArrays(static_cast<GLenum>(mode), 0, static_cast<GLsizei>(count));
+        m_drawCallCount++;
+
+        GL::BindVertexArray(0);
+        GL::BindTexture(GL_TEXTURE_2D, 0);
+        GL::UseProgram(0);
     }
 
     void ImmediateRenderer2D::DrawSDF(const Math::TransformationMatrix& transform, CS200::RGBA fill_color, CS200::RGBA line_color, double line_width, SDFShape sdf_shape)
