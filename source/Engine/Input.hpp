@@ -53,6 +53,16 @@ namespace CS230
             Down,
             Escape,
             Tab,
+            Num1,
+            Num2,
+            Num3,
+            Num4,
+            Num5,
+            Num6,
+            Num7,
+            Num8,
+            Num9,
+            Num0,
             Count
         };
 
@@ -115,6 +125,16 @@ namespace CS230
             case Input::Keys::Down: return "Down";
             case Input::Keys::Escape: return "Escape";
             case Input::Keys::Tab: return "Tab";
+            case Input::Keys::Num1: return "Num1";
+            case Input::Keys::Num2: return "Num2";
+            case Input::Keys::Num3: return "Num3";
+            case Input::Keys::Num4: return "Num4";
+            case Input::Keys::Num5: return "Num5";
+            case Input::Keys::Num6: return "Num6";
+            case Input::Keys::Num7: return "Num7";
+            case Input::Keys::Num8: return "Num8";
+            case Input::Keys::Num9: return "Num9";
+            case Input::Keys::Num0: return "Num0";
             case Input::Keys::Count: return "Count";
         }
         return "Unknown";

@@ -8,7 +8,7 @@
 #include "Engine/Engine.hpp"
 #include "Engine/GameStateManager.hpp"
 #include "Engine/Window.hpp"
-#include "Demo/DemoPerformance.hpp"
+#include "Demo/WorldScene.hpp"
 
 namespace
 {
@@ -63,7 +63,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     Engine& engine = Engine::Instance();
     engine.Start("Sungwoo Yang");
-    engine.GetGameStateManager().PushState<DemoPerformance>();
+    engine.GetGameStateManager().PushState<WorldScene>();
 
 #if !defined(__EMSCRIPTEN__)
     while (engine.HasGameEnded() == false)

@@ -53,6 +53,16 @@ namespace
             case CS230::Input::Keys::Down: return SDL_SCANCODE_DOWN;
             case CS230::Input::Keys::Escape: return SDL_SCANCODE_ESCAPE;
             case CS230::Input::Keys::Tab: return SDL_SCANCODE_TAB;
+            case CS230::Input::Keys::Num1: return SDL_SCANCODE_KP_1;
+            case CS230::Input::Keys::Num2: return SDL_SCANCODE_KP_2;
+            case CS230::Input::Keys::Num3: return SDL_SCANCODE_KP_3;
+            case CS230::Input::Keys::Num4: return SDL_SCANCODE_KP_4;
+            case CS230::Input::Keys::Num5: return SDL_SCANCODE_KP_5;
+            case CS230::Input::Keys::Num6: return SDL_SCANCODE_KP_6;
+            case CS230::Input::Keys::Num7: return SDL_SCANCODE_KP_7;
+            case CS230::Input::Keys::Num8: return SDL_SCANCODE_KP_8;
+            case CS230::Input::Keys::Num9: return SDL_SCANCODE_KP_9;
+            case CS230::Input::Keys::Num0: return SDL_SCANCODE_KP_0;
             default: return SDL_SCANCODE_UNKNOWN;
         }
     }
