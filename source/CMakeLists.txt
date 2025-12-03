@@ -17,9 +17,9 @@ set(SOURCE_CODE
     CS200/RGBA.hpp
     CS200/BatchRenderer2D.hpp CS200/BatchRenderer2D.cpp
     CS200/InstancedRenderer2D.hpp CS200/InstancedRenderer2D.cpp
-    CS200/Camera.hpp CS200/Camera.cpp
 
-    Demo/WorldScene.hpp Demo/WorldScene.cpp
+    Demo/DemoPerformance.hpp Demo/DemoPerformance.cpp
+    Demo/DemoCreativeScene.hpp Demo/DemoCreativeScene.cpp
 
     Engine/Engine.hpp Engine/Engine.cpp
     Engine/Error.hpp

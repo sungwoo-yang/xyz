@@ -1,5 +1,34 @@
 # CS200 Computer Graphics I
 
+This project is a 2D rendering engine demo for the CS200 Computer Graphics I course. It implements and compares multiple 2D rendering techniques using C++ and OpenGL.
+
+The engine supports three distinct renderers: **Immediate Mode**, **Batch Mode**, and **Instanced Mode**. You can switch between them in real-time via ImGui controls to visually compare their performance by adjusting the number of sprites on screen.
+
+## Project DemosThis project includes two main demo scenes. The default starting scene is `DemoPerformance`.
+
+### 1. DemoPerformance (Default)
+
+The performance demo tests the efficiency of the three rendering pipelines by drawing thousands of sprites.
+
+* **Immediate Renderer**: Issues one `glDrawElements` call for every single sprite. This is simple for a few objects but suffers from severe CPU overhead as the count grows.
+* **Batch Renderer**: Batches vertex data for many sprites (that share textures) into one large buffer, minimizing `glDrawElements` calls to one per frame.
+* **Instanced Renderer**: Tells the GPU to draw a single quad mesh thousands of times, using a separate buffer for per-instance data (transform, color, UV offset). This is achieved with a single `glDrawElementsInstanced` call.
+
+**ImGui Controls:**
+* Switch renderers in real-time using the `Immediate`, `Batch`, and `Instanced` radio buttons.
+* Adjust the number of sprites rendered using the `Sprite Count` buttons.
+* Monitor the `Draw Calls` counter to see how many draw commands each renderer issues per frame.
+
+### 2. DemoCreativeScene
+
+A simple 2.5D parallax scrolling demo utilizing the `BatchRenderer2D`.
+
+* Features a background (planets), mid-ground (stars), and foreground (platforms) scrolling at different speeds to create a sense of depth.
+* Thousands of star particles are drawn efficiently using the batch renderer.
+
+**ImGui Controls:**
+* Click the `Switch to Performance Demo` button to return to the `DemoPerformance` scene.
+
 ## How to Build and Run
 
 First Setup your [Development Environment](docs/DevEnvironment.md)
