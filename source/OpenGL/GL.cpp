@@ -639,11 +639,6 @@ namespace GL
         glCheck(glLineWidth(width));
     }
 
-    void PointSize(GLfloat size SOURCE_LOCATION)
-    {
-        glCheck(glPointSize(size));
-    }
-
     void PixelStorei(GLenum pname, GLint param SOURCE_LOCATION)
     {
         glCheck(glPixelStorei(pname, param));

@@ -236,10 +236,6 @@ void WorldScene::DrawWorld(const Math::TransformationMatrix& viewProj) const
         }
     }
 
-#ifndef GL_POINT_SIZE
-#    define GL_POINT_SIZE 0x0B11
-#endif
-    GL::PointSize(3.0f);
     immRenderer.DrawVertices(CS200::PrimitiveType::Points, stars, 0xFFFFFF88);
 
     std::vector<Math::vec2> lines;
@@ -380,62 +376,80 @@ void WorldScene::DrawImGui()
 {
     if (ImGui::Begin("Program Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        const auto&    env = Engine::GetWindowEnvironment();
-        CS200::Camera& cam = m_cameras[0];
-        const Player&  p   = m_players[0];
+        const auto& env = Engine::GetWindowEnvironment();
 
-        ImGui::Text("%d", env.FPS);
-        ImGui::SameLine(200);
-        ImGui::Text("FPS");
-        ImGui::Text("%.3f seconds", env.DeltaTime);
-        ImGui::SameLine(200);
-        ImGui::Text("Delta time");
+        ImGui::Text("FPS: %d", env.FPS);
+        ImGui::SameLine(150);
+        ImGui::Text("dt: %.3f", env.DeltaTime);
+        ImGui::Text("Screen: %.0f x %.0f", env.DisplaySize.x, env.DisplaySize.y);
 
-        ImGui::Text("Device( %.0f, %.0f)", env.DisplaySize.x, env.DisplaySize.y);
-        ImGui::SameLine(200);
-        ImGui::Text("Screen Size");
+        ImGui::Separator();
 
-        ImGui::Text("Camera( %.0f, %.0f)", cam.position.x, cam.position.y);
-        ImGui::Text("World ( %.0f, %.0f)", p.position.x, p.position.y);
+        static int  selectedCamIdx = 0;
+        const char* items[]        = { "All Cameras", "Player 1", "Player 2", "Player 3", "Player 4" };
+        ImGui::Combo("Control Target", &selectedCamIdx, items, IM_ARRAYSIZE(items));
 
-        double degrees = cam.rotation * 180.0 / 3.14159265;
+        int            displayIdx    = (selectedCamIdx == 0) ? 0 : selectedCamIdx - 1;
+        CS200::Camera& displayCam    = m_cameras[static_cast<size_t>(displayIdx)];
+        const Player&  displayPlayer = m_players[static_cast<size_t>(displayIdx)];
+
+        ImGui::Text("Pos: (%.0f, %.0f)", displayPlayer.position.x, displayPlayer.position.y);
+
+        double degrees = displayCam.rotation * 180.0 / 3.14159265;
         while (degrees < 0)
             degrees += 360.0;
         while (degrees >= 360.0)
             degrees -= 360.0;
-        ImGui::Text("%.0f degrees", degrees);
+        ImGui::Text("Rot: %.0f deg", degrees);
 
         ImGui::Separator();
 
-        double zoom        = cam.zoom;
-        int    zoomPercent = static_cast<int>(zoom * 100.0);
-
-        if (ImGui::SliderInt("##Zoom", &zoomPercent, 10, 500, "%d%%"))
+        int zoomPercent = static_cast<int>(displayCam.zoom * 100.0);
+        if (ImGui::SliderInt("Zoom", &zoomPercent, 10, 500, "%d%%"))
         {
-            cam.zoom = static_cast<double>(zoomPercent) / 100.0;
+            double newZoom = static_cast<double>(zoomPercent) / 100.0;
+
+            if (selectedCamIdx == 0)
+            {
+                for (auto& cam : m_cameras)
+                    cam.zoom = newZoom;
+            }
+            else
+            {
+                m_cameras[static_cast<size_t>(selectedCamIdx - 1)].zoom = newZoom;
+            }
         }
-        ImGui::SameLine();
-        ImGui::Text("Zoom");
 
-        bool isFirstPerson = (cam.mode == CS200::CameraMode::FirstPerson_View);
-        if (ImGui::Checkbox("First Person Camera", &isFirstPerson))
+        bool isFirstPerson = (displayCam.mode == CS200::CameraMode::FirstPerson_View);
+        if (ImGui::Checkbox("First Person View", &isFirstPerson))
         {
-            cam.mode = isFirstPerson ? CS200::CameraMode::FirstPerson_View : CS200::CameraMode::ThirdPerson_Follow;
+            CS200::CameraMode newMode = isFirstPerson ? CS200::CameraMode::FirstPerson_View : CS200::CameraMode::ThirdPerson_Follow;
+
+            if (selectedCamIdx == 0)
+            {
+                for (auto& cam : m_cameras)
+                    cam.mode = newMode;
+            }
+            else
+            {
+                m_cameras[static_cast<size_t>(selectedCamIdx - 1)].mode = newMode;
+            }
         }
 
         ImGui::Separator();
-        if (ImGui::TreeNode("Viewport Controls"))
+
+        if (ImGui::TreeNodeEx("Viewport Count", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if (ImGui::RadioButton("1 View", m_activeViewportCount == 1))
-                m_activeViewportCount = 1;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("2 Views", m_activeViewportCount == 2))
-                m_activeViewportCount = 2;
-            if (ImGui::RadioButton("3 Views", m_activeViewportCount == 3))
-                m_activeViewportCount = 3;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("4 Views", m_activeViewportCount == 4))
-                m_activeViewportCount = 4;
+            for (int i = 1; i <= 4; ++i)
+            {
+                std::string label = std::to_string(i) + " View";
+                if (ImGui::RadioButton(label.c_str(), m_activeViewportCount == i))
+                {
+                    m_activeViewportCount = i;
+                }
+                if (i < 4)
+                    ImGui::SameLine();
+            }
             ImGui::TreePop();
         }
     }

@@ -91,7 +91,6 @@ namespace GL
     void           GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid** pointer SOURCE_LOCATION);
     void           Hint(GLenum target, GLenum mode SOURCE_LOCATION);
     void           LineWidth(GLfloat width SOURCE_LOCATION);
-    void           PointSize(GLfloat size SOURCE_LOCATION);
     void           LinkProgram(GLuint program SOURCE_LOCATION);
     void           PixelStorei(GLenum pname, GLint param SOURCE_LOCATION);
     void           PolygonOffset(GLfloat factor, GLfloat units SOURCE_LOCATION);
