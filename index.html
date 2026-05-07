@@ -1,0 +1,228 @@
+<!-- https://youtu.be/_xkSvufmjEs?si=mh-MXT2ZdUasYAYn&t=3416 -->
+<!-- adobe.ly/2GAgF93 -->
+<!-- https://scrimba.com/build-and-deploy-your-portfolio-c012 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../img/face.jpg">
+
+    <!-- Help auto scale for desktop & mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sungwoo yang Portfolio Website</title>
+
+    <!-- Normalize the difference across browsers  https://necolas.github.io/normalize.css/ -->
+    <link rel="stylesheet" href="external/normalize.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
+        integrity="sha256-46qynGAkLSFpVbEBog43gvNhfrOj+BmwXdxFgVK/Kvc=" crossorigin="anonymous" />
+
+    <!-- https://fonts.google.com/selection/embed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <!-- alt text can be blank since the logo is purely decorative and putting something like logo isn't actually helpful -->
+            <img src="img/cout.jpg" alt="">
+        </div>
+        <button class="nav-toggle" aria-label="toggle navigation">
+            <span class="hamburger"></span>
+        </button>
+        <nav class="nav">
+            <ul class="nav__list">
+                <li class="nav__item"> <a href="#home" class="nav__link">Home</a> </li>
+                <li class="nav__item"> <a href="#skills" class="nav__link">Skills</a> </li>
+                <li class="nav__item"> <a href="#about" class="nav__link">About Me</a> </li>
+                <li class="nav__item"> <a href="#projects" class="nav__link">Projects</a> </li>
+                <li class="nav__item"> <a href="#resume" class="nav__link">Resume</a> </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Introduction -->
+
+    <section class="intro" id="#home">
+        <!-- TODO put in a mouse based interactive shader visualization page-->
+        <!-- <div class="intro-bg">
+            <iframe src="webgl/for_fun.html"></iframe>
+        </div> -->
+        <h1 class="section__title section__title--intro">
+            Hi, I am <strong>Sungwoo Yang</strong>
+        </h1>
+        <p class="section__subtitle section__subtitle--intro">Game Programmer</p>
+        <img src="img/face.jpg" alt="a picture of Sungwoo Yang smiling" class="intro__img" />
+    </section>
+
+    <!-- My Services -->
+    <section class="my-services" id="skills">
+        <h2 class="section__title section__title--services">Skills</h2>
+        <div class="services">
+            <div class="service">
+                <h3>C++ & Graphics API</h3>
+                <p>
+                    Experienced in C++ and real-time graphics programming. Familiar with modern C++ features, type
+                    safety (static_cast), and implementing rendering techniques using OpenGL and WebGL.
+                </p>
+            </div>
+
+            <div class="service">
+                <h3>Engine Development</h3>
+                <p>
+                    Developing custom 2D/3D game engines. Comfortable with structuring game loops, managing memory, and
+                    building systems from scratch using SDL2 and C++.
+                </p>
+            </div>
+
+            <div class="service">
+                <h3>Cross-Platform Dev</h3>
+                <p>
+                    Building and testing applications across Windows and Linux (WSL) environments. Focused on writing
+                    reliable code without platform-specific issues like variable shadowing.
+                </p>
+            </div>
+        </div>
+
+        <a href="#projects" class="btn">Projects</a>
+    </section>
+
+    <!-- About Me -->
+    <section class="about-me" id="about">
+        <h2 class="section__title section__title--about">Who I am</h2>
+        <p class="section__subtitle section__subtitle--about">
+            Student and C++ Game Programmer
+        </p>
+
+        <div class="about-me__body">
+            <p>
+                THello! I am Sungwoo Yang, a Computer Science student at DigiPen Institute of Technology, based in
+                Daegu, South Korea. I am interested in systems programming, computer graphics, and learning how game
+                engines work under the hood.
+            </p>
+            <p>
+                Currently, I am working as the Tech Lead for a team project named <strong>ASTAR</strong>, where we are
+                developing our own C++ game engine. I enjoy the process of solving technical problems and implementing
+                features like procedural generation, lighting, and custom shaders.
+            </p>
+            <p>
+                My team and I are actively working on our game to showcase it at upcoming developer events, including
+                the Seoul Indies meetup and the BIC Festival.
+            </p>
+        </div>
+        <img src="img/tall.jpg" alt="picture of Sungwoo Yang" class="about-me__img" />
+    </section>
+
+    <!-- My Portfolio -->
+    <section class="my-projects" id="projects">
+        <h2 class="section__title section__title--projects">My Projects</h2>
+        <p class="section__subtitle section__subtitle--projects">
+            A selection of my range of projects
+        </p>
+        <div class="portfolio">
+            <a href="portfolio/01_hello.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/01_hello.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/02_meshes.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/02_meshes.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/03_fog.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/03_fog.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/04_toon.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/04_toon.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/05_shadow.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/05_shadow.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/06_value.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/06_value.jpg" alt="" class="portfolio__img" />
+            </a>
+            <a href="portfolio/07_gradient.html" class="portfolio__item">
+                <img src="img/portfolio_thumbnails/07_gradient.jpg" alt="" class="portfolio__img" />
+            </a>
+
+        </div>
+    </section>
+
+    <!-- Resume Section -->
+    <section class="my-resume" id="resume">
+        <h2 class="section__title section__title--resume">Resume</h2>
+        <a target="_blank" href="docs/Resume.pdf"><i class="far fa-file-pdf"></i> PDF</a>
+
+        <div class="resume-section">
+            <h3>Experience</h3>
+            <div class="resume-item">
+                <p>
+                    <b>Tech Lead, Team ASTAR</b><br>
+                    Sept 2025 - Present<br>
+                    <em>Daegu, South Korea</em><br>
+                    Leading the technical direction and engine architecture for a custom C++ game project. Responsible
+                    for managing the development scope and ensuring code quality across the team.
+                </p>
+            </div>
+
+            <h3>Projects</h3>
+            <div class="resume-item">
+                <p>
+                    <b>Custom Game Engine (ASTAR)</b><br>
+                    Sept 2025 - Present<br>
+                    <em>Graphics Programmer / Tech Lead</em><br>
+                    Developed a high-performance 2D engine using <b>C++, OpenGL, and SDL2</b>. Transitioned the project
+                    from Raylib to a custom abstraction to gain finer control over rendering and memory. Implemented
+                    features including SVG-based map parsing and a custom light reflection system.
+                </p>
+            </div>
+            <div class="resume-item">
+                <p>
+                    <b>CS250 Graphics Portfolio</b><br>
+                    Feb 2026 - Present<br>
+                    <em>Individual Developer</em><br>
+                    Built a series of WebGL-compatible graphics demos showcasing **Procedural Geometry, Exponential Fog,
+                    Toon Shading, and Shadow Mapping**. Focused on robust cross-platform compatibility verified through
+                    Windows and WSL environments.
+                </p>
+            </div>
+
+            <h3>Education</h3>
+            <div class="resume-item">
+                <p>
+                    <b>B.S. in Computer Science in Real-Time Interactive Simulation</b><br>
+                    Expected May 2026<br>
+                    <em>DigiPen Institute of Technology | Redmond, WA & Daegu, Korea</em><br>
+                    Relevant Courses: Computer Graphics, Advanced C/C++, Linear Algebra, Game Implementation Techniques.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- /Resume Section -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="mailto:sungwoo.yangl@digipen.edu" class="footer__link">sungwoo.yang@digipen.edu</a>
+        <ul class="social-list">
+            <li class="social-list__item">
+                <a class="social-list__link" href="https://linkedin.com/in/sungwoo-yang">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+            </li>
+            <li class="social-list__item">
+                <a class="social-list__link" href="https://github.com/sungwoo-yang">
+                    <i class="fab fa-github"></i>
+                </a>
+            </li>
+            <!-- Want to list more? search : https://fontawesome.com/v5/search?ic=brands -->
+        </ul>
+    </footer>
+
+    <script src="js/index.js"></script>
+</body>
+
+</html>
