@@ -14,9 +14,14 @@
   --fw-reg: 300;
   --fw-bold: 900;
 
-  --clr-light: #ffffff;
-  --clr-dark: #303030;
-  --clr-accent: #16e0bd;
+  --clr-light: #e5e7eb;
+  --clr-dark: #0f172a;
+  --clr-accent: #38bdf8;
+
+  --clr-bg: #020617;
+  --clr-surface: #111827;
+  --clr-surface-light: #1f2937;
+  --clr-muted: #94a3b8;
 
   --fs-h1: 3rem;
   --fs-h2: 2.25rem;
@@ -44,8 +49,8 @@ html {
 }
 
 body {
-  background: var(--clr-light);
-  color: var(--clr-dark);
+  background: var(--clr-bg);
+  color: var(--clr-light);
   margin: 0;
   font-family: var(--ff-primary);
   font-size: var(--fs-body);
@@ -145,7 +150,9 @@ header {
   display: flex;
   justify-content: space-between;
   padding: 1em;
+  background: var(--clr-bg);
 }
+
 .logo {
   max-width: 528px;
 }
@@ -243,6 +250,7 @@ header {
 .hamburger::before {
   top: 6px;
 }
+
 .hamburger::after {
   bottom: 6px;
 }
@@ -353,7 +361,7 @@ header {
     margin-right: auto;
   }
 
-  .service + .service {
+  .service+.service {
     margin-left: 2em;
   }
 }
@@ -546,7 +554,9 @@ header {
   max-width: 1200px;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 3; /* Maintain aspect ratio */
-  margin: 0 auto; /* Centering */
+  aspect-ratio: 4 / 3;
+  /* Maintain aspect ratio */
+  margin: 0 auto;
+  /* Centering */
   border: none;
 }
