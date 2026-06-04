@@ -10,7 +10,7 @@
 
     <!-- Help auto scale for desktop & mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STUDENT TODO Website</title>
+    <title>CS250 Sungwoo Yang Assignments</title>
 
     <!-- Normalize the difference across browsers  https://necolas.github.io/normalize.css/ -->
     <link rel="stylesheet" href="../external/normalize.css">
@@ -68,18 +68,60 @@
     </section>
 
     <div class="portfolio-item-individual">
+        <h1>Value Noise</h1>
+
         <h2>Project Overview</h2>
-        <p>Provide a brief description of the project, its purpose, and what you aimed to achieve.</p>
+        <p>
+            This project implements a procedural Value Noise system in C++ and visualizes the generated noise
+            as an OpenGL texture. The goal of the assignment was to create smooth, repeatable noise patterns
+            using permutation hashing, interpolation, and adjustable smoothing methods. The demo supports
+            1D, 2D, and 3D noise evaluation and allows the user to modify the result in real time through
+            ImGui controls.
+        </p>
+        <p>
+            Value Noise is useful for generating procedural textures such as grayscale noise, colored noise,
+            turbulence, marble, and wood-like patterns. Instead of relying on image files, the texture is
+            generated from random values and mathematical interpolation, making it flexible and fully
+            procedural.
+        </p>
 
         <h2>Tasks Completed</h2>
-        <ul>
-            <li>Describe the tasks you completed for this project.</li>
-            <li>Be specific about your contributions and the technologies used.</li>
-        </ul>
+        <p>
+            For this assignment, I implemented the core Value Noise algorithm and integrated it into the
+            existing CS250 graphics framework. I added support for 1D, 2D, and 3D noise evaluation, using
+            linear interpolation for 1D, bilinear interpolation for 2D, and trilinear interpolation for 3D.
+            I also implemented multiple smoothing methods, including linear, cosine, smoothstep, and quintic
+            smoothing.
+        </p>
+        <p>
+            I implemented a permutation hash table to select repeatable random values for each lattice point.
+            This allows the generated noise to tile correctly when the texture is repeated. I also added
+            texture upload functionality so that newly generated RGBA pixel data can be sent to an existing
+            OpenGL texture without recreating the entire texture object every frame.
+        </p>
+        <p>
+            In the demo interface, I connected ImGui controls for period dimension, smoothing method, texture
+            size, tiling scale, noise dimension, Z input for 3D noise, and pattern type. I also added shader
+            files for displaying the generated texture on a full-screen plane.
+        </p>
 
         <h2>Reflection</h2>
-        <p>Reflect on the project, discussing any challenges faced, solutions implemented, and what you learned from the
-            experience.</p>
+        <p>
+            The most important part of this assignment was understanding how continuous input coordinates are
+            converted into discrete lattice coordinates. Each input position must be split into a base lattice
+            point, a next lattice point, and an interpolation value. Once this structure was clear, the 1D,
+            2D, and 3D versions of the algorithm became extensions of the same idea.
+        </p>
+        <p>
+            Another challenge was making the noise tile seamlessly. To solve this, I used the selected period
+            dimension as the size of the permutation table and wrapped lattice coordinates with a period mask.
+            This made the texture repeat cleanly when the tiling scale was increased.
+        </p>
+        <p>
+            This project helped me better understand procedural texture generation, interpolation, hashing,
+            and texture updates in OpenGL. It also showed how small algorithmic choices, such as the smoothing
+            function, can noticeably change the final visual result.
+        </p>
     </div>
 
     <div class="portfolio-item-individual">
@@ -89,15 +131,15 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <a href="mailto:my.email@digipen.edu" class="footer__link">my.email@digipen.edu</a>
+        <a href="mailto:my.email@digipen.edu" class="footer__link">sungwoo.yang@digipen.edu</a>
         <ul class="social-list">
             <li class="social-list__item">
-                <a class="social-list__link" href="https://linkedin.com/in/mylinkedinid">
+                <a class="social-list__link" href="https://linkedin.com/in/sungwoo-yang">
                     <i class="fab fa-linkedin"></i>
                 </a>
             </li>
             <li class="social-list__item">
-                <a class="social-list__link" href="https://github.com/mygithubid">
+                <a class="social-list__link" href="https://github.com/sungwoo-yang">
                     <i class="fab fa-github"></i>
                 </a>
             </li>

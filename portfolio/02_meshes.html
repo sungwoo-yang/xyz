@@ -10,8 +10,7 @@
 
     <!-- Help auto scale for desktop & mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>STUDENT TODO Website</title>
+    <title>CS250 Sungwoo Yang Assignments</title>
 
     <!-- Normalize the difference across browsers  https://necolas.github.io/normalize.css/ -->
     <link rel="stylesheet" href="../external/normalize.css">
@@ -61,7 +60,6 @@
 
     <!-- Introduction -->
     <section class="intro">
-        <!-- TODO put the name of the assignment here -->
         <h1 class="section__title section__title--intro">
             Project <strong>Procedural Geometric Modeling</strong>
         </h1>
@@ -71,17 +69,47 @@
 
     <div class="portfolio-item-individual">
         <h2>Project Overview</h2>
-        <p>Provide a brief description of the project, its purpose, and what you aimed to achieve.</p>
+        <p>
+            This project implements procedural mesh generation for several common 3D primitives, including a plane,
+            cube, sphere, torus, cylinder, and cone. The goal was to generate geometry directly in code by creating
+            vertex positions, normals, UV coordinates, and index buffers, then display the results in an interactive
+            OpenGL/WebGL demo.
+        </p>
+        <p>
+            The demo allows users to view the generated models with texture mapping, wireframe rendering, and normal
+            visualization. It also includes controls for changing the number of stacks and slices so the mesh resolution
+            can be inspected in real time.
+        </p>
 
         <h2>Tasks Completed</h2>
         <ul>
-            <li>Describe the tasks you completed for this project.</li>
-            <li>Be specific about your contributions and the technologies used.</li>
+            <li>Integrated the Procedural Meshes demo into the existing CS250 graphics demo framework.</li>
+            <li>Registered the new demo in the demo factory so it can be launched with the short name
+                <code>meshes</code>.</li>
+            <li>Added the required mesh and material source files to the CMake build configuration.</li>
+            <li>Implemented grid-based index buffer generation for triangle meshes.</li>
+            <li>Generated procedural vertices, normals, UV coordinates, and indices for plane, cube, sphere, torus,
+                cylinder, and cone geometry.</li>
+            <li>Implemented cap generation for closed cylinder and cone meshes.</li>
+            <li>Added support for textured rendering, wireframe rendering, and normal visualization.</li>
+            <li>Built and tested the project for both Windows and WebGL release output.</li>
         </ul>
 
         <h2>Reflection</h2>
-        <p>Reflect on the project, discussing any challenges faced, solutions implemented, and what you learned from the
-            experience.</p>
+        <p>
+            The most important part of this assignment was understanding how a mesh is built from structured vertex
+            data and triangle indices. I first implemented the reusable grid index buffer, then used the same stack and
+            slice pattern to generate different shapes. This made the implementation more consistent across the sphere,
+            torus, cylinder, and cone.
+        </p>
+        <p>
+            One challenge was keeping the winding order, normals, and UV coordinates correct for each primitive. The
+            cylinder and cone caps required special care because incorrect triangle ordering can cause faces to
+            disappear
+            when back-face culling is enabled. Through this project, I became more comfortable with procedural geometry,
+            normal generation, texture coordinate mapping, and debugging mesh topology visually through wireframes and
+            normal lines.
+        </p>
     </div>
 
     <div class="portfolio-item-individual">
@@ -91,15 +119,15 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <a href="mailto:my.email@digipen.edu" class="footer__link">my.email@digipen.edu</a>
+        <a href="mailto:my.email@digipen.edu" class="footer__link">sungwoo.yang@digipen.edu</a>
         <ul class="social-list">
             <li class="social-list__item">
-                <a class="social-list__link" href="https://linkedin.com/in/mylinkedinid">
+                <a class="social-list__link" href="https://linkedin.com/in/sungwoo-yang">
                     <i class="fab fa-linkedin"></i>
                 </a>
             </li>
             <li class="social-list__item">
-                <a class="social-list__link" href="https://github.com/mygithubid">
+                <a class="social-list__link" href="https://github.com/sungwoo-yang      ">
                     <i class="fab fa-github"></i>
                 </a>
             </li>

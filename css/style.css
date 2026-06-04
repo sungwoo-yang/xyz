@@ -134,6 +134,7 @@ h3 {
 .section__subtitle--intro,
 .section__subtitle--about {
   background: var(--clr-accent);
+  color: var(--clr-bg);
   padding: 0.25em 1em;
   font-family: var(--ff-secondary);
   margin-bottom: 1em;
@@ -459,7 +460,7 @@ header {
 }
 
 .resume-section h3 {
-  color: var(--clr-dark);
+  color: var(--clr-light);
   text-align: center;
 }
 
