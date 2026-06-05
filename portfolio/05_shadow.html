@@ -68,18 +68,58 @@
     </section>
 
     <div class="portfolio-item-individual">
-        <h2>Project Overview</h2>
-        <p>Provide a brief description of the project, its purpose, and what you aimed to achieve.</p>
+        <h3>Project Overview</h3>
+        <p>
+            This project implements shadow mapping for an interactive OpenGL graphics demo. The scene is rendered from
+            the
+            perspective of a light source to generate a depth map, and that depth map is then used during the main
+            rendering
+            pass to determine whether visible fragments are lit or in shadow. The demo also includes debugging tools
+            such as
+            shadow map visualization and light frustum rendering.
+        </p>
+        <p>
+            The goal of this assignment was to integrate framebuffer rendering, depth textures, camera transformations,
+            shader-based depth comparison, and exponential fog into a complete real-time graphics demo.
+        </p>
 
-        <h2>Tasks Completed</h2>
+        <h3>Tasks Completed</h3>
         <ul>
-            <li>Describe the tasks you completed for this project.</li>
-            <li>Be specific about your contributions and the technologies used.</li>
+            <li>Registered the Shadow Mapping demo in the demo factory.</li>
+            <li>Updated the build system to include the new shadow mapping source files.</li>
+            <li>Extended the Texture class to support depth textures and RGBA8 render targets.</li>
+            <li>Implemented framebuffer creation, attachment, binding, and completeness checks.</li>
+            <li>Implemented camera view and world transformation matrices.</li>
+            <li>Rendered the scene from the light camera to generate a shadow depth map.</li>
+            <li>Rendered the scene from the viewer camera using the generated shadow map.</li>
+            <li>Implemented shadow projection lookup with <code>textureProj</code>.</li>
+            <li>Added exponential fog and gamma correction in the shadow shader.</li>
+            <li>Added debug visualization for the depth texture and light frustum.</li>
         </ul>
 
-        <h2>Reflection</h2>
-        <p>Reflect on the project, discussing any challenges faced, solutions implemented, and what you learned from the
-            experience.</p>
+        <h3>Reflection</h3>
+        <p>
+            The most challenging part of this project was keeping the coordinate spaces consistent between the camera
+            view,
+            light view, projection space, and shadow texture space. Shadow mapping depends heavily on correct matrix
+            order,
+            so small mistakes in the view matrix, projection matrix, or shadow bias matrix can cause the shadow map
+            lookup
+            to fail.
+        </p>
+        <p>
+            Another important challenge was framebuffer setup. The depth texture needed the correct internal format,
+            comparison mode, wrapping behavior, and filtering settings to work correctly as a shadow map. Debugging the
+            depth
+            texture visualization helped confirm that the light-space depth pass was being rendered correctly.
+        </p>
+        <p>
+            This assignment helped me better understand how real-time shadows are produced using multiple render passes.
+            It
+            also showed how framebuffers, textures, cameras, and shaders work together as a full graphics pipeline
+            rather
+            than as isolated systems.
+        </p>
     </div>
 
     <div class="portfolio-item-individual">
